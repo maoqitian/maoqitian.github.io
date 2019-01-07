@@ -1824,7 +1824,7 @@ pre .javascript .function {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #14ff22;
+  background: #ff3dff;
 }
 .links-of-blogroll {
   font-size: 13px;
@@ -2661,4 +2661,12 @@ embed {
 }
 .links-of-blogroll-inline .links-of-blogroll-item {
   display: inline-block;
+}
+@font-face {
+  font-family: Bungasai;
+  src: url("/fonts/Bungasai.ttf");
+}
+.site-title {
+  font-size: 50px !important;
+  font-family: 'Bungasai' !important;
 }
