@@ -108,7 +108,7 @@
 <meta property="og:image" content="https://github.com/maoqitian/MaoMdPhoto/raw/master/FastDFS/fastdfs-client-java%E6%89%93%E5%8C%85%E6%88%90%E5%8A%9F.png">
 <meta property="og:image" content="https://github.com/maoqitian/MaoMdPhoto/raw/master/FastDFS/FastDFS-java-client%20%E4%B8%8A%E4%BC%A0%E5%9B%BE%E7%89%87%E6%88%90%E5%8A%9F.png">
 <meta property="og:image" content="https://github.com/maoqitian/MaoMdPhoto/raw/master/FastDFS/%E6%B5%8B%E8%AF%95%E4%B8%8A%E4%BC%A0%E7%9A%84%E5%9B%BE%E7%89%87%E6%98%AF%E5%90%A6%E5%8F%AF%E4%BB%A5%E8%BF%9B%E8%A1%8C%E8%AE%BF%E9%97%AE.png">
-<meta property="og:updated_time" content="2019-01-12T08:38:56.925Z">
+<meta property="og:updated_time" content="2019-01-12T09:00:58.214Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="FastDFS服务器集群部署和集成客户端到SpringBoot">
 <meta name="twitter:description" content="FastDFS是一个开源的轻量级分布式文件系统，它对文件进行管理，功能包括：文件存储、文件同步、文件访问（文件上传、文件下载）等，解决了大容量存储和负载均衡的问题，同时也能做到在集群环境下一台机子上传文件，同时该组下的其他节点下也备份了上传的文件。做分布式系统开发时，其中要解决的一个问题就是图片、音视频、文件共享的问题和数据备份，分布式文件系统正好可以解决这个需求。FastDFS的服务主要有两个">
@@ -338,30 +338,8 @@
               
               
                 <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java/" itemprop="url" rel="index">
-                    <span itemprop="name">Java</span>
-                  </a>
-                </span>
-
-                
-                
-                  ， 
-                
-              
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java/Linux/" itemprop="url" rel="index">
-                    <span itemprop="name">Linux</span>
-                  </a>
-                </span>
-
-                
-                
-                  ， 
-                
-              
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java/Linux/FastDFS/" itemprop="url" rel="index">
-                    <span itemprop="name">FastDFS</span>
+                  <a href="/categories/后端/" itemprop="url" rel="index">
+                    <span itemprop="name">后端</span>
                   </a>
                 </span>
 
@@ -443,21 +421,64 @@
 <p>FastDFS是一个开源的轻量级分布式文件系统，它对文件进行管理，功能包括：文件存储、文件同步、文件访问（文件上传、文件下载）等，解决了大容量存储和负载均衡的问题，同时也能做到在集群环境下一台机子上传文件，同时该组下的其他节点下也备份了上传的文件。做分布式系统开发时，其中要解决的一个问题就是图片、音视频、文件共享的问题和数据备份，分布式文件系统正好可以解决这个需求。FastDFS的服务主要有两个角色Tracker和Storage，Tracker服务用于负责调度storage节点与client通信，在访问上起负载均衡的作用，和记录storage节点的运行状态，是连接client和storage节点的枢纽，Storage用于保存文件</p>
 </blockquote>
 <h3 id="1-FastDFS集群部署"><a href="#1-FastDFS集群部署" class="headerlink" title="1.FastDFS集群部署"></a>1.FastDFS集群部署</h3><h4 id="1-1-整体部署模块图"><a href="#1-1-整体部署模块图" class="headerlink" title="1.1 整体部署模块图"></a>1.1 整体部署模块图</h4><p><img src="https://github.com/maoqitian/MaoMdPhoto/raw/master/FastDFS/FastDFS%E9%83%A8%E7%BD%B2%E7%A4%BA%E6%84%8F%E5%9B%BE.png" alt="FastDFS部署示意图"></p>
-<h4 id="1-2-环境准备"><a href="#1-2-环境准备" class="headerlink" title="1.2 环境准备"></a>1.2 环境准备</h4><pre><code>| 名称         | 描述           |
-|:--|-|
-| centos系统版本|6.9|
-|libfatscommon|FastDFS分离出的一些公用函数包|
-|FastDFS|FastDFS主程序|
-|fastdfs-nginx-module|FastDFS和nginx的关联模块|
-|nginx|nginx1.15.5|
-</code></pre><h4 id="1-3-安装编译环境"><a href="#1-3-安装编译环境" class="headerlink" title="1.3 安装编译环境"></a>1.3 安装编译环境</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install git gcc gcc-c++ make automake autoconf libtool pcre pcre-devel zlib zlib-devel openssl-devel wget vim -y</span><br></pre></td></tr></table></figure>
-<h4 id="1-4-磁盘安装路径说明"><a href="#1-4-磁盘安装路径说明" class="headerlink" title="1.4 磁盘安装路径说明"></a>1.4 磁盘安装路径说明</h4><pre><code>|说明|位置|
-|-|-|
-|FastDFS所以安装包安装位置|/usr/local/src|
-|tracker数据 |/data/fdfs/tracker|
-|Storage数据 |/data/fdfs/Storage|
-|配置文件路径|/etc/fdfs|
-</code></pre><h4 id="1-5-安装libfatscommon"><a href="#1-5-安装libfatscommon" class="headerlink" title="1.5 安装libfatscommon"></a>1.5 安装libfatscommon</h4><ul>
+<h4 id="1-2-环境准备"><a href="#1-2-环境准备" class="headerlink" title="1.2 环境准备"></a>1.2 环境准备</h4><table>
+<thead>
+<tr>
+<th>名称</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>centos系统版本</td>
+<td>6.9</td>
+</tr>
+<tr>
+<td>libfatscommon</td>
+<td>FastDFS分离出的一些公用函数包</td>
+</tr>
+<tr>
+<td>FastDFS</td>
+<td>FastDFS主程序</td>
+</tr>
+<tr>
+<td>fastdfs-nginx-module</td>
+<td>FastDFS和nginx的关联模块</td>
+</tr>
+<tr>
+<td>nginx</td>
+<td>nginx1.15.5</td>
+</tr>
+</tbody>
+</table>
+<h4 id="1-3-安装编译环境"><a href="#1-3-安装编译环境" class="headerlink" title="1.3 安装编译环境"></a>1.3 安装编译环境</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install git gcc gcc-c++ make automake autoconf libtool pcre pcre-devel zlib zlib-devel openssl-devel wget vim -y</span><br></pre></td></tr></table></figure>
+<h4 id="1-4-磁盘安装路径说明"><a href="#1-4-磁盘安装路径说明" class="headerlink" title="1.4 磁盘安装路径说明"></a>1.4 磁盘安装路径说明</h4><table>
+<thead>
+<tr>
+<th>说明</th>
+<th>位置</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FastDFS所以安装包安装位置</td>
+<td>/usr/local/src</td>
+</tr>
+<tr>
+<td>tracker数据</td>
+<td>/data/fdfs/tracker</td>
+</tr>
+<tr>
+<td>Storage数据</td>
+<td>/data/fdfs/Storage</td>
+</tr>
+<tr>
+<td>配置文件路径</td>
+<td>/etc/fdfs</td>
+</tr>
+</tbody>
+</table>
+<h4 id="1-5-安装libfatscommon"><a href="#1-5-安装libfatscommon" class="headerlink" title="1.5 安装libfatscommon"></a>1.5 安装libfatscommon</h4><ul>
 <li><p><a href="https://github.com/happyfish100/libfastcommon" target="_blank" rel="noopener">下载libfatscommon</a></p>
 </li>
 <li><p>解压、安装</p>
@@ -731,7 +752,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-count">2</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
