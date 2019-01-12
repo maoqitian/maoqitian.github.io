@@ -101,7 +101,7 @@
 <meta property="og:image" content="https://github.com/maoqitian/MaoMdPhoto/raw/master/Android%20%E6%BA%90%E7%A0%81%E7%BC%96%E8%AF%91/%E8%BF%90%E8%A1%8C%E6%A8%A1%E6%8B%9F%E5%99%A8.png">
 <meta property="og:image" content="https://github.com/maoqitian/MaoMdPhoto/raw/master/Android%20%E6%BA%90%E7%A0%81%E7%BC%96%E8%AF%91/%E7%BC%96%E8%AF%91idegen.png">
 <meta property="og:image" content="https://github.com/maoqitian/MaoMdPhoto/raw/master/Android%20%E6%BA%90%E7%A0%81%E7%BC%96%E8%AF%91/Android%E6%BA%90%E7%A0%81%E7%BC%96%E8%AF%91%E5%A4%B1%E8%B4%A51.png">
-<meta property="og:updated_time" content="2019-01-10T15:18:26.663Z">
+<meta property="og:updated_time" content="2019-01-11T16:14:15.588Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Android 源码编译">
 <meta name="twitter:description" content="android源码编译的四个流程:1.源码下载;2.构建编译环境;3.编译源码;4运行.  Ubuntu 18.04（虚拟机）环境下编译Android 源码1.源码下载 首先确保自己已经安装了Git. 123sudo apt-get install git git config –global user.email “test@test.com” git config –global user.">
@@ -503,14 +503,14 @@ eng | 开发工程师的版本,拥有最大的权限,此外还附带了许多deb
 <li><p>您可以使用make编译任何代码。GNUMake可以借助 -jN参数处理并行任务，通常使用的任务数N介于编译时所用计算机上硬件线程数的1-2倍之间。例如，在一台双核 E5520 计算机（2 个 CPU，每个 CPU 4 个内核，每个内核2个线程）上，要实现最快的编译速度，可以使用介于make -j16 到 make -j32 之间的命令。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make -j8</span><br></pre></td></tr></table></figure>
 </li>
-<li><p>编译中<br>  <img src="https://github.com/maoqitian/MaoMdPhoto/raw/master/Android%20%E6%BA%90%E7%A0%81%E7%BC%96%E8%AF%91/Android%E6%BA%90%E7%A0%81%E7%AD%89%E5%BE%85%E7%BC%96%E8%AF%91%E8%BF%87%E7%A8%8B.png" alt="image"></p>
+<li><p>编译中<br>  <img src="https://github.com/maoqitian/MaoMdPhoto/raw/master/Android%20%E6%BA%90%E7%A0%81%E7%BC%96%E8%AF%91/Android%E6%BA%90%E7%A0%81%E7%AD%89%E5%BE%85%E7%BC%96%E8%AF%91%E8%BF%87%E7%A8%8B.png" alt="Android源码等待编译过程"></p>
 </li>
 </ul>
-<h3 id="编译完成"><a href="#编译完成" class="headerlink" title="编译完成"></a>编译完成</h3><p>  <img src="https://github.com/maoqitian/MaoMdPhoto/raw/master/Android%20%E6%BA%90%E7%A0%81%E7%BC%96%E8%AF%91/%E7%BC%96%E8%AF%91%E5%AE%8C%E6%88%90.png" alt="image"></p>
+<h3 id="编译完成"><a href="#编译完成" class="headerlink" title="编译完成"></a>编译完成</h3><p>  <img src="https://github.com/maoqitian/MaoMdPhoto/raw/master/Android%20%E6%BA%90%E7%A0%81%E7%BC%96%E8%AF%91/%E7%BC%96%E8%AF%91%E5%AE%8C%E6%88%90.png" alt="编译完成"></p>
 <ul>
 <li><p>运行模拟器</p>
    <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">//依次输入以下命令（如果是在编译成功源码之后直接想运行模拟器，则直接输入emulator命令就行，因为前面编译源码已经输入过以上两条命令）</span><br><span class="line"></span><br><span class="line">. build/envsetup.sh</span><br><span class="line"></span><br><span class="line">lunch(选择刚才你编译源码设置的目标版本)</span><br><span class="line"></span><br><span class="line">emulator</span><br></pre></td></tr></table></figure>
-<p>   <img src="https://github.com/maoqitian/MaoMdPhoto/raw/master/Android%20%E6%BA%90%E7%A0%81%E7%BC%96%E8%AF%91/%E8%BF%90%E8%A1%8C%E6%A8%A1%E6%8B%9F%E5%99%A8.png" alt="image"></p>
+<p>   <img src="https://github.com/maoqitian/MaoMdPhoto/raw/master/Android%20%E6%BA%90%E7%A0%81%E7%BC%96%E8%AF%91/%E8%BF%90%E8%A1%8C%E6%A8%A1%E6%8B%9F%E5%99%A8.png" alt="运行模拟器"></p>
 </li>
 </ul>
 <h3 id="将源码导入Android-Studio-查看"><a href="#将源码导入Android-Studio-查看" class="headerlink" title="将源码导入Android Studio 查看"></a>将源码导入Android Studio 查看</h3><ul>
@@ -523,7 +523,7 @@ eng | 开发工程师的版本,拥有最大的权限,此外还附带了许多deb
 <ul>
 <li>android.ipr 一般保存了工程相关的设置，比如modules和modules libraries的路径，编译器配置，入口点等。</li>
 <li><p>android.iml 用来描述modules。它包括modules路径、 依赖关系，顺序设置等。一个项目可以包含多个 *.iml 文件。</p>
-<p><img src="https://github.com/maoqitian/MaoMdPhoto/raw/master/Android%20%E6%BA%90%E7%A0%81%E7%BC%96%E8%AF%91/%E7%BC%96%E8%AF%91idegen.png" alt="image"></p>
+<p><img src="https://github.com/maoqitian/MaoMdPhoto/raw/master/Android%20%E6%BA%90%E7%A0%81%E7%BC%96%E8%AF%91/%E7%BC%96%E8%AF%91idegen.png" alt="编译idegen"></p>
 </li>
 <li><p>打开Android studio，点击File&gt;Open，选择刚刚生成的android.ipr导入就可以了，依据个人机子性能问题，导入时间有快有慢。</p>
 </li>
@@ -532,7 +532,7 @@ eng | 开发工程师的版本,拥有最大的权限,此外还附带了许多deb
 </ul>
 <h3 id="编译中遇到的坑"><a href="#编译中遇到的坑" class="headerlink" title="编译中遇到的坑"></a>编译中遇到的坑</h3><ul>
 <li><p>Error: library-pathout/host/linux-x86/lib64/libsepolwrap.so does not exist</p>
-<p><img src="https://github.com/maoqitian/MaoMdPhoto/raw/master/Android%20%E6%BA%90%E7%A0%81%E7%BC%96%E8%AF%91/Android%E6%BA%90%E7%A0%81%E7%BC%96%E8%AF%91%E5%A4%B1%E8%B4%A51.png" alt="image"> </p>
+<p><img src="https://github.com/maoqitian/MaoMdPhoto/raw/master/Android%20%E6%BA%90%E7%A0%81%E7%BC%96%E8%AF%91/Android%E6%BA%90%E7%A0%81%E7%BC%96%E8%AF%91%E5%A4%B1%E8%B4%A51.png" alt="Android源码编译失败1"> </p>
 </li>
 <li><p>解决 ： </p>
 <blockquote>
@@ -637,6 +637,10 @@ eng | 开发工程师的版本,拥有最大的权限,此外还附带了许多deb
 
           <div class="post-nav-prev post-nav-item">
             
+              <a href="/2019/01/12/FastDFS服务器集群部署和集成客户端到SpringBoot/" rel="prev" title="FastDFS服务器集群部署和集成客户端到SpringBoot">
+                FastDFS服务器集群部署和集成客户端到SpringBoot <i class="fa fa-chevron-right"></i>
+              </a>
+            
           </div>
         </div>
       
@@ -716,7 +720,7 @@ eng | 开发工程师的版本,拥有最大的权限,此外还附带了许多deb
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-count">3</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -727,7 +731,7 @@ eng | 开发工程师的版本,拥有最大的权限,此外还附带了许多deb
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-count">4</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -738,7 +742,7 @@ eng | 开发工程师的版本,拥有最大的权限,此外还附带了许多deb
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-count">7</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
