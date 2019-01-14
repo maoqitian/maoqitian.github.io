@@ -52,6 +52,38 @@
 
 
 
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic|PT Mono:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
 
 
 
@@ -415,14 +447,14 @@
 </blockquote>
 <h2 id="Ubuntu-18-04（虚拟机）环境下编译Android-源码"><a href="#Ubuntu-18-04（虚拟机）环境下编译Android-源码" class="headerlink" title="Ubuntu 18.04（虚拟机）环境下编译Android 源码"></a>Ubuntu 18.04（虚拟机）环境下编译Android 源码</h2><h3 id="源码下载"><a href="#源码下载" class="headerlink" title="源码下载"></a>源码下载</h3><ul>
 <li><p>首先确保自己已经安装了Git.</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install git </span><br><span class="line">git config –global user.email “test@test.com” </span><br><span class="line">git config –global user.name “test”</span><br></pre></td></tr></table></figure>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-<span class="builtin-name">get</span> install git </span><br><span class="line">git<span class="built_in"> config </span>–global user.email “test@test.com” </span><br><span class="line">git<span class="built_in"> config </span>–global user.name “test”</span><br></pre></td></tr></table></figure>
 </li>
 <li><p>使用清华大学镜像</p>
 <ul>
 <li><a href="https://mirror.tuna.tsinghua.edu.cn/help/AOSP/" target="_blank" rel="noopener">Android 镜像使用帮助</a></li>
 <li>首先要下载repo 工具</li>
 </ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">mkdir ~/bin</span><br><span class="line">PATH=~/bin:$PATH</span><br><span class="line">curl https://storage.googleapis.com/git-repo-downloads/repo &gt; ~/bin/repo</span><br><span class="line">chmod a+x ~/bin/repo</span><br><span class="line">//拒绝连接可以使用tuna的git-repo镜像</span><br><span class="line">详情查看网址https://mirrors.tuna.tsinghua.edu.cn/help/git-repo/</span><br></pre></td></tr></table></figure>
+<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">mkdir ~<span class="regexp">/bin</span></span><br><span class="line"><span class="regexp">PATH=~/bin</span>:$PATH</span><br><span class="line">curl <span class="symbol">https:</span>/<span class="regexp">/storage.googleapis.com/git</span>-repo-downloads/repo &gt; ~<span class="regexp">/bin/repo</span></span><br><span class="line">chmod a+x ~<span class="regexp">/bin/repo</span></span><br><span class="line">/<span class="regexp">/拒绝连接可以使用tuna的git-repo镜像</span></span><br><span class="line"><span class="regexp">详情查看网址https:/</span><span class="regexp">/mirrors.tuna.tsinghua.edu.cn/help</span><span class="regexp">/git-repo/</span></span><br></pre></td></tr></table></figure>
 <ul>
 <li>使用每月更新的初始化包</li>
 <li><p>下载地址 <a href="https://mirrors.tuna.tsinghua.edu.cn/aosp-monthly/aosp-latest.tar" target="_blank" rel="noopener">每月更新的初始化包</a></p>
@@ -430,22 +462,22 @@
 <li><p>由于所有代码都是从隐藏的 .repo 目录中 checkout 出来的，所以只保留了 .repo 目录，下载后解压 再 repo sync 一遍即可得到完整的目录</p>
 </li>
 </ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">使用方法如下:</span><br><span class="line"></span><br><span class="line">wget -c https://mirrors.tuna.tsinghua.edu.cn/aosp-mo nthly/aosp-latest.tar # 下载初始化包</span><br><span class="line">tar xf aosp-latest.tar</span><br><span class="line">cd AOSP   # 解压得到的 AOSP 工程目录</span><br><span class="line"># 这时 ls 的话什么也看不到，因为只有一个隐藏的 .repo 目录</span><br><span class="line">repo sync # 正常同步一遍即可得到完整目录</span><br><span class="line"># 或 repo sync -l 仅checkout代码</span><br></pre></td></tr></table></figure>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">使用方法如下:</span><br><span class="line"></span><br><span class="line">wget -c https:<span class="regexp">//mi</span>rrors.tuna.tsinghua.edu.cn<span class="regexp">/aosp-mo nthly/</span>aosp-latest.tar <span class="comment"># 下载初始化包</span></span><br><span class="line">tar xf aosp-latest.tar</span><br><span class="line">cd AOSP   <span class="comment"># 解压得到的 AOSP 工程目录</span></span><br><span class="line"><span class="comment"># 这时 ls 的话什么也看不到，因为只有一个隐藏的 .repo 目录</span></span><br><span class="line">repo sync <span class="comment"># 正常同步一遍即可得到完整目录</span></span><br><span class="line"><span class="comment"># 或 repo sync -l 仅checkout代码</span></span><br></pre></td></tr></table></figure>
 </li>
 </ul>
 <h3 id="构建编译环境"><a href="#构建编译环境" class="headerlink" title="构建编译环境"></a>构建编译环境</h3><h4 id="硬件要求"><a href="#硬件要求" class="headerlink" title="硬件要求:"></a>硬件要求:</h4><ul>
 <li>64位的操作系统只能编译2.3.x以上的版本,如果你想要编译2.3.x以下的,那么需要32位的操作系统.<br>  磁盘空间越多越好,至少在100GB以上.意思就是,你可以去买个大点的硬盘了啊<br>  如果你想要在是在虚拟机运行linux,那么至少需要16GB的RAM/swap. </li>
 </ul>
 <h4 id="软件要求"><a href="#软件要求" class="headerlink" title="软件要求"></a>软件要求</h4><ul>
-<li>安装 openJDK 8   <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install openjdk-8-jdk</span><br></pre></td></tr></table></figure>
+<li>安装 openJDK 8   <figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-<span class="builtin-name">get</span> update</span><br><span class="line">sudo apt-<span class="builtin-name">get</span> install openjdk-8-jdk</span><br></pre></td></tr></table></figure>
 </li>
 </ul>
 <ul>
 <li><p>依赖设置:</p>
-   <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install libx11-dev:i386 libreadline6-dev:i386 libgl1-mesa-dev g++-multilib </span><br><span class="line">sudo apt-get install -y git flex bison gperf build-essential libncurses5-dev:i386 </span><br><span class="line">sudo apt-get install tofrodos python-markdown libxml2-utils xsltproc zlib1g-dev:i386 </span><br><span class="line">sudo apt-get install dpkg-dev libsdl1.2-dev libesd0-dev</span><br><span class="line">sudo apt-get install git-core gnupg flex bison gperf build-essential  </span><br><span class="line">sudo apt-get install zip curl zlib1g-dev gcc-multilib g++-multilib </span><br><span class="line">sudo apt-get install libc6-dev-i386 </span><br><span class="line">sudo apt-get install lib32ncurses5-dev x11proto-core-dev libx11-dev </span><br><span class="line">sudo apt-get install libgl1-mesa-dev libxml2-utils xsltproc unzip m4</span><br><span class="line">sudo apt-get install lib32z-dev ccache</span><br></pre></td></tr></table></figure>
+   <figure class="highlight q"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-<span class="built_in">get</span> install libx11-<span class="built_in">dev</span>:i386 libreadline6-<span class="built_in">dev</span>:i386 libgl1-mesa-<span class="built_in">dev</span> g++-multilib </span><br><span class="line">sudo apt-<span class="built_in">get</span> install -y git flex bison gperf build-essential libncurses5-<span class="built_in">dev</span>:i386 </span><br><span class="line">sudo apt-<span class="built_in">get</span> install tofrodos python-markdown libxml2-utils xsltproc zlib1g-<span class="built_in">dev</span>:i386 </span><br><span class="line">sudo apt-<span class="built_in">get</span> install dpkg-<span class="built_in">dev</span> libsdl1<span class="number">.2</span>-<span class="built_in">dev</span> libesd0-<span class="built_in">dev</span></span><br><span class="line">sudo apt-<span class="built_in">get</span> install git-core gnupg flex bison gperf build-essential  </span><br><span class="line">sudo apt-<span class="built_in">get</span> install zip curl zlib1g-<span class="built_in">dev</span> gcc-multilib g++-multilib </span><br><span class="line">sudo apt-<span class="built_in">get</span> install libc6-<span class="built_in">dev</span>-i386 </span><br><span class="line">sudo apt-<span class="built_in">get</span> install lib32ncurses5-<span class="built_in">dev</span> x11proto-core-<span class="built_in">dev</span> libx11-<span class="built_in">dev</span> </span><br><span class="line">sudo apt-<span class="built_in">get</span> install libgl1-mesa-<span class="built_in">dev</span> libxml2-utils xsltproc unzip m4</span><br><span class="line">sudo apt-<span class="built_in">get</span> install lib32z-<span class="built_in">dev</span> ccache</span><br></pre></td></tr></table></figure>
 </li>
 <li><p>依赖设置中有可能会出现“无法定位软件包 libesd0-dev” 这个问题</p>
-   <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">解决方案：</span><br><span class="line">在etc/apt   的sources.list 添加镜像源   deb http://archive.ubuntu.com/ubuntu/ trusty main universe restricted multiverse</span><br><span class="line"></span><br><span class="line">然后 sudo apt-get update  接着继续使用该命令安装就可以了</span><br></pre></td></tr></table></figure>
+   <figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">解决方案：</span><br><span class="line">在etc/apt   的sources.<span class="keyword">list</span> 添加镜像源   <span class="keyword">deb</span> http://archive.ubuntu.<span class="keyword">com</span>/ubuntu/ trusty main universe restricted multiverse</span><br><span class="line"></span><br><span class="line">然后 sudo apt-<span class="built_in">get</span> <span class="keyword">update</span>  接着继续使用该命令安装就可以了</span><br></pre></td></tr></table></figure>
 </li>
 <li><p>操作系统要求 </p>
 <p>  Android版本 | 编译要求的Ubuntu最低版本<br>  —|—<br>  Android 6.0至AOSP master | Ubuntu 14.04<br>  Android 2.3.x至Android 5.x | Ubuntu 12.04<br>  Android 1.5至Android 2.2.x | Ubuntu 10.04</p>
@@ -484,10 +516,10 @@
 <p><a href="https://source.android.com/source/initializing#installing-required-packages-ubuntu-1404" target="_blank" rel="noopener">搭建编译环境</a></p>
 </li>
 </ul>
-<h3 id="初始化编译环境"><a href="#初始化编译环境" class="headerlink" title="初始化编译环境"></a>初始化编译环境</h3>   <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">source build/envsetup.sh </span><br><span class="line">或者</span><br><span class="line">. build/envsetup.sh</span><br></pre></td></tr></table></figure>
+<h3 id="初始化编译环境"><a href="#初始化编译环境" class="headerlink" title="初始化编译环境"></a>初始化编译环境</h3>   <figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">source</span> build/envsetup.<span class="keyword">sh</span> </span><br><span class="line">或者</span><br><span class="line">. build/envsetup.<span class="keyword">sh</span></span><br></pre></td></tr></table></figure>
 <ul>
 <li><p>选择目标</p>
- <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">. lunch aosp_arm64-eng</span><br></pre></td></tr></table></figure>
+ <figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="bullet">. </span>lunch aosp<span class="emphasis">_arm64-eng</span></span><br></pre></td></tr></table></figure>
 </li>
 <li><p>该命令表示针对模拟器进行完整编译，并且所有调试功能均处于启用状态。<br> 如果您没有提供任何参数就运行命令，lunch 将提示您从菜单中选择一个目标。<br> 所有编译目标都采用 BUILD-BUILDTYPE 形式，其中 BUILD 是表示特定功能组合的代号。</p>
 </li>
@@ -501,7 +533,7 @@ eng | 开发工程师的版本,拥有最大的权限,此外还附带了许多deb
 </ul>
 <h3 id="编译源码"><a href="#编译源码" class="headerlink" title="编译源码"></a>编译源码</h3><ul>
 <li><p>您可以使用make编译任何代码。GNUMake可以借助 -jN参数处理并行任务，通常使用的任务数N介于编译时所用计算机上硬件线程数的1-2倍之间。例如，在一台双核 E5520 计算机（2 个 CPU，每个 CPU 4 个内核，每个内核2个线程）上，要实现最快的编译速度，可以使用介于make -j16 到 make -j32 之间的命令。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make -j8</span><br></pre></td></tr></table></figure>
+<figure class="highlight gauss"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">make</span> -j8</span><br></pre></td></tr></table></figure>
 </li>
 <li><p>编译中<br>  <img src="https://github.com/maoqitian/MaoMdPhoto/raw/master/Android%20%E6%BA%90%E7%A0%81%E7%BC%96%E8%AF%91/Android%E6%BA%90%E7%A0%81%E7%AD%89%E5%BE%85%E7%BC%96%E8%AF%91%E8%BF%87%E7%A8%8B.png" alt="Android源码等待编译过程"></p>
 </li>
@@ -509,16 +541,16 @@ eng | 开发工程师的版本,拥有最大的权限,此外还附带了许多deb
 <h3 id="编译完成"><a href="#编译完成" class="headerlink" title="编译完成"></a>编译完成</h3><p>  <img src="https://github.com/maoqitian/MaoMdPhoto/raw/master/Android%20%E6%BA%90%E7%A0%81%E7%BC%96%E8%AF%91/%E7%BC%96%E8%AF%91%E5%AE%8C%E6%88%90.png" alt="编译完成"></p>
 <ul>
 <li><p>运行模拟器</p>
-   <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">//依次输入以下命令（如果是在编译成功源码之后直接想运行模拟器，则直接输入emulator命令就行，因为前面编译源码已经输入过以上两条命令）</span><br><span class="line"></span><br><span class="line">. build/envsetup.sh</span><br><span class="line"></span><br><span class="line">lunch(选择刚才你编译源码设置的目标版本)</span><br><span class="line"></span><br><span class="line">emulator</span><br></pre></td></tr></table></figure>
+   <figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//依次输入以下命令（如果是在编译成功源码之后直接想运行模拟器，则直接输入emulator命令就行，因为前面编译源码已经输入过以上两条命令）</span></span><br><span class="line"></span><br><span class="line">. build/envsetup.sh</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="title">lunch</span><span class="params">(选择刚才你编译源码设置的目标版本)</span></span></span><br><span class="line"></span><br><span class="line">emulator</span><br></pre></td></tr></table></figure>
 <p>   <img src="https://github.com/maoqitian/MaoMdPhoto/raw/master/Android%20%E6%BA%90%E7%A0%81%E7%BC%96%E8%AF%91/%E8%BF%90%E8%A1%8C%E6%A8%A1%E6%8B%9F%E5%99%A8.png" alt="运行模拟器"></p>
 </li>
 </ul>
 <h3 id="将源码导入Android-Studio-查看"><a href="#将源码导入Android-Studio-查看" class="headerlink" title="将源码导入Android Studio 查看"></a>将源码导入Android Studio 查看</h3><ul>
 <li><p>编译idegen</p>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">source build/envsetup.sh // 将执行文件设置为临时变量</span><br><span class="line">mmm development/tools/idegen/  //生成idegen.jar文件（#### build completed successfully (49 seconds) #### 标识生成idegen.jar文件）</span><br></pre></td></tr></table></figure>
+  <figure class="highlight coffeescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">source build<span class="regexp">/envsetup.sh /</span>/ 将执行文件设置为临时变量</span><br><span class="line">mmm development<span class="regexp">/tools/idegen/</span>  <span class="regexp">//</span>生成idegen.jar文件（<span class="comment">#### build completed successfully (49 seconds) ###</span><span class="comment"># 标识生成idegen.jar文件）</span></span><br></pre></td></tr></table></figure>
 </li>
 <li><p>执行脚本 idegen.sh</p>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">. development/tools/idegen/idegen.sh</span><br></pre></td></tr></table></figure>
+  <figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="bullet">. </span>development/tools/idegen/idegen.sh</span><br></pre></td></tr></table></figure>
 <p>  看到下图，表示编译idegen完成，执行成功后在asop的根目录下生成android.ipr和android.iml两个个文件：</p>
 <ul>
 <li>android.ipr 一般保存了工程相关的设置，比如modules和modules libraries的路径，编译器配置，入口点等。</li>
@@ -540,7 +572,7 @@ eng | 开发工程师的版本,拥有最大的权限,此外还附带了许多deb
 </blockquote>
 </li>
 <li><p>openJDK 配置环境变量方法</p>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">1.用gedit文本编辑器在/etc/profile中添加环境变量：</span><br><span class="line">命令 ： sudo gedit /etc/profile</span><br><span class="line"></span><br><span class="line">2.在打开的/etc/profile文件末尾添加下面几行：</span><br><span class="line">export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64</span><br><span class="line">export JRE_HOME=$&#123;JAVA_HOME&#125;/jre </span><br><span class="line">export CLASSPATH=.:$&#123;JAVA_HOME&#125;/lib:$&#123;JRE_HOME&#125;/lib </span><br><span class="line">export PATH=$&#123;JAVA_HOME&#125;/bin:$PATH</span><br></pre></td></tr></table></figure>
+  <figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">1.用gedit文本编辑器在/etc/profile中添加环境变量：</span><br><span class="line">命令 ： sudo gedit /etc/profile</span><br><span class="line"></span><br><span class="line">2.在打开的/etc/profile文件末尾添加下面几行：</span><br><span class="line"><span class="builtin-name">export</span> <span class="attribute">JAVA_HOME</span>=/usr/lib/jvm/java-8-openjdk-amd64</span><br><span class="line"><span class="builtin-name">export</span> <span class="attribute">JRE_HOME</span>=<span class="variable">$&#123;JAVA_HOME&#125;</span>/jre </span><br><span class="line"><span class="builtin-name">export</span> <span class="attribute">CLASSPATH</span>=.:$&#123;JAVA_HOME&#125;/lib:<span class="variable">$&#123;JRE_HOME&#125;</span>/lib </span><br><span class="line"><span class="builtin-name">export</span> <span class="attribute">PATH</span>=<span class="variable">$&#123;JAVA_HOME&#125;</span>/bin:$PATH</span><br></pre></td></tr></table></figure>
 </li>
 </ul>
 <h3 id="最后说点"><a href="#最后说点" class="headerlink" title="最后说点"></a>最后说点</h3><ul>
