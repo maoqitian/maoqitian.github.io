@@ -119,15 +119,15 @@
       <category term="持续集成（CI）" scheme="https://www.maoqitian.com/categories/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%EF%BC%88CI%EF%BC%89/"/>
     
     
-      <category term="CentOS" scheme="https://www.maoqitian.com/tags/CentOS/"/>
-    
-      <category term="Maven" scheme="https://www.maoqitian.com/tags/Maven/"/>
-    
       <category term="Jenkins" scheme="https://www.maoqitian.com/tags/Jenkins/"/>
     
       <category term="git" scheme="https://www.maoqitian.com/tags/git/"/>
     
       <category term="GitLab" scheme="https://www.maoqitian.com/tags/GitLab/"/>
+    
+      <category term="CentOS" scheme="https://www.maoqitian.com/tags/CentOS/"/>
+    
+      <category term="Maven" scheme="https://www.maoqitian.com/tags/Maven/"/>
     
       <category term="Tomcat" scheme="https://www.maoqitian.com/tags/Tomcat/"/>
     
@@ -157,13 +157,13 @@
     
       <category term="Java" scheme="https://www.maoqitian.com/tags/Java/"/>
     
-      <category term="FastDFS" scheme="https://www.maoqitian.com/tags/FastDFS/"/>
-    
-      <category term="spring boot" scheme="https://www.maoqitian.com/tags/spring-boot/"/>
-    
       <category term="CentOS" scheme="https://www.maoqitian.com/tags/CentOS/"/>
     
       <category term="Maven" scheme="https://www.maoqitian.com/tags/Maven/"/>
+    
+      <category term="FastDFS" scheme="https://www.maoqitian.com/tags/FastDFS/"/>
+    
+      <category term="spring boot" scheme="https://www.maoqitian.com/tags/spring-boot/"/>
     
   </entry>
   
