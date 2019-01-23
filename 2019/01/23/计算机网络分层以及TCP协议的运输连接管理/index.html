@@ -132,9 +132,9 @@
 <meta property="og:image" content="https://github.com/maoqitian/MaoMdPhoto/raw/master/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/%E7%BD%91%E7%BB%9C%E6%95%B0%E6%8D%AE%E5%9C%A8%E5%90%84%E5%B1%82%E4%B9%8B%E9%97%B4%E7%9A%84%E4%BC%A0%E9%80%92%E8%BF%87%E7%A8%8B.png">
 <meta property="og:image" content="https://github.com/maoqitian/MaoMdPhoto/raw/master/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/TCP%20IP%E5%8D%8F%E8%AE%AE%E6%97%8F%E7%A4%BA%E6%84%8F.png">
 <meta property="og:image" content="https://github.com/maoqitian/MaoMdPhoto/raw/master/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B%E5%BB%BA%E7%AB%8BTCP%E8%BF%9E%E6%8E%A5%E7%A4%BA%E6%84%8F%E5%9B%BE.png">
-<meta property="og:image" content="https://github.com/maoqitian/MaoMdPhoto/raw/master/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/TCP%E8%BF%9E%E6%8E%A5%E9%87%8A%E6%94%BE%E8%BF%87%E7%A8%8B(%E5%9B%9B%E6%AC%A1%E6%8F%A1%E6%89%8B">
+<meta property="og:image" content="https://raw.githubusercontent.com/maoqitian/MaoMdPhoto/master/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/TCP%E8%BF%9E%E6%8E%A5%E9%87%8A%E6%94%BE%E8%BF%87%E7%A8%8B(%E5%9B%9B%E6%AC%A1%E6%8F%A1%E6%89%8B">
 <meta property="og:image" content="https://github.com/maoqitian/MaoMdPhoto/raw/master/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/TCP%E6%8A%A5%E6%96%87%E9%A6%96%E9%83%A8%E6%88%AA%E5%9B%BE.jpg">
-<meta property="og:updated_time" content="2019-01-23T15:41:03.414Z">
+<meta property="og:updated_time" content="2019-01-23T15:44:10.501Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="计算机网络分层以及TCP协议的运输连接管理">
 <meta name="twitter:description" content="计算机网络基础对于我们软件开发者来说是很重要的基础知识，不管是日常的开发，抓包，或者网络框架的学习等，计算机网络知识都是基础。而学习计算机网络分层次的体系结构也是最基本的，下面我们就来复习一下计算机网络的体系结构。  计算机网络体系结构 想起大学学习计算机网络的时候，我们一般把计算机网络分为五层协议体系结构，分别为应用层、运输层、网络层、数据链路层、物理层。 计算机网络各层及其协议的集合我们称为">
@@ -514,7 +514,7 @@
 <li>通过前面的流程走下来，我们了解到TCP的三次握手就是A和B三次交互的过程最终建立了连接，到这里你可能会有一个疑问，<strong>为什么是三次握手建立连接，两次握手建立连接好像也是可行的</strong>？</li>
 <li>三次握手的原因为：发送的报文是会失效的，而三次握手就是为了防止已失效的请求报文突然又传送到服务端。还是上面的A和B例子，如果A发送请求报文赢网络滞后原因延迟让B接收到，本来A发送的报文已经失效，而B在延迟接收到该报文之后并确认与A连接，但是A已经认为发到B的报文已经失效，则不会再次发送报文到B，这时候B确认与A连接则一直砸等待A发送数据，则会造成B的资源白白等待A而浪费，所以多加一次确认握手，这时B没有收到再次确认则不会建立连接，避免出现资源浪费。<h3 id="“四次握手”"><a href="#“四次握手”" class="headerlink" title="“四次握手”"></a>“四次握手”</h3><h4 id="TCP连接释放"><a href="#TCP连接释放" class="headerlink" title="TCP连接释放"></a>TCP连接释放</h4></li>
 <li>TCP经过三次握手建立连接之后，客户和服务器发送完数据之后，还需要释放连接，下面我们来分析一个TCP连接释放的过程。</li>
-<li>TCP连接释放过程是四次握手，我们先看看过程示意图<br><img src="https://github.com/maoqitian/MaoMdPhoto/raw/master/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/TCP%E8%BF%9E%E6%8E%A5%E9%87%8A%E6%94%BE%E8%BF%87%E7%A8%8B(%E5%9B%9B%E6%AC%A1%E6%8F%A1%E6%89%8B" alt="TCP连接释放过程(四次握手)">.png)</li>
+<li>TCP连接释放过程是四次握手，我们先看看过程示意图<br><img src="https://raw.githubusercontent.com/maoqitian/MaoMdPhoto/master/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/TCP%E8%BF%9E%E6%8E%A5%E9%87%8A%E6%94%BE%E8%BF%87%E7%A8%8B(%E5%9B%9B%E6%AC%A1%E6%8F%A1%E6%89%8B" alt="TCP连接释放过程(四次握手)">.png)</li>
 </ul>
 <h4 id="TCP连接释放过程："><a href="#TCP连接释放过程：" class="headerlink" title="TCP连接释放过程："></a>TCP连接释放过程：</h4><ul>
 <li>首先，A和B双方数据传输结束，此时他们都处于已建立连接（ESTABLISHED）状态，这时A进程先向TCP发出连接释放报文，并停止发送数据，主动关闭TCP连接，A此时进入终止等待1（FIN-WAIT-1）状态。这时A发送的连接释放报文终止控制位FIN=1，释放报文的序号seq=u（u应该等于A前面传递数据的最后一个字节序号加上1，这里不懂前面发送数据序号数值，直接用u代替），TCP规定即使FIN报文段不携带数据也是要消耗一个序号的。</li>
