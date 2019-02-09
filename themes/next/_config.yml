@@ -420,8 +420,9 @@ gitment:
 # Available value:
 #    button | slide
 # Warning: Baidu Share does not support https.
-#baidushare:
-##  type: button
+baidushare:
+  type: slide
+  baidushare: true
 
 # Share
 # This plugin is more useful in China, make sure you known how to use it.
@@ -698,7 +699,7 @@ pace: true
 pace_theme: pace-theme-center-atom
 
 # Canvas-nest
-canvas_nest: true
+canvas_nest: false
 
 # three_waves
 three_waves: false
