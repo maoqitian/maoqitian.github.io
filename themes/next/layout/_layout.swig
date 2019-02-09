@@ -94,5 +94,7 @@
   {% include '_third-party/exturl.swig' %}
 </body>
 </html>
+<!-- 自定义页面背景动效 -->
 <script type="text/javascript" src="/js/src/dynamic_bg.js"></script>
-
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>
