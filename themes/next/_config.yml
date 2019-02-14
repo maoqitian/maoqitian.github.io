@@ -130,7 +130,7 @@ social:
   GitHub: https://github.com/maoqitian || github
   掘金: https://juejin.im/user/59e956626fb9a045204b57d4 || drupal 
   简书: https://www.jianshu.com/u/f58cd7ff1a08 || book
-  #E-Mail: mailto:yourname@gmail.com || envelope
+  E-Mail: mailto:maoqitian068@163.com || envelope
   #Google: https://plus.google.com/yourname || google
   #Twitter: https://twitter.com/yourname || twitter
   #FB Page: https://www.facebook.com/yourname || facebook
@@ -146,12 +146,12 @@ social_icons:
   transition: false
 
 # Blog rolls
-links_icon: link
-links_title: Links
+links_icon: pagelines
+links_title: 友情链接
 links_layout: block
 #links_layout: inline
-#links:
-  #Title: http://example.com/
+links:
+  玩Android: http://www.wanandroid.com/
 
 # Sidebar Avatar
 # in theme directory(source/images): /images/avatar.gif
