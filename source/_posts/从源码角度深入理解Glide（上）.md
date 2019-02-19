@@ -1798,6 +1798,7 @@ private void onResourceReady(Resource<R> resource, R result, DataSource dataSour
 Glide.with(Context).load(IMAGE_URL).into(mImageView);
 ```
 - 就是这样一句简单的代码，它背后所走的逻辑却让人头皮发麻，此时我只想说一句话“read the fuck source code”。前面我们只是分析了Glide简单的加载图片流程，它的缓存使用，各种变换，回调和各种功能原理还没分析到，这只能等到下篇文章了。文章中如果有错误，请大家给我提出来，大家一起学习进步，如果觉得我的文章给予你帮助，也请给我一个喜欢和关注，同时也欢迎访问我的[**个人博客**](https://www.maoqitian.com)。
+- 对本文感兴趣的朋友请继续阅读[从源码角度深入理解Glide（下）](https://www.maoqitian.com/2019/02/19/%E4%BB%8E%E6%BA%90%E7%A0%81%E8%A7%92%E5%BA%A6%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3glide%EF%BC%88%E4%B8%8B%EF%BC%89/)
 - 参考链接
 
   - [Gldie文档](http://bumptech.github.io/glide/)
