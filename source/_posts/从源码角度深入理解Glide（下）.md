@@ -8,6 +8,7 @@ tags:
 - 图片加载
 - Android
 - 源码分析
+- LRU
 ---
 ![image](https://raw.githubusercontent.com/bumptech/glide/master/static/glide_logo.png)
 > 上一篇文章[从源码角度深入理解Glide（上）](https://www.maoqitian.com/2019/02/19/%E4%BB%8E%E6%BA%90%E7%A0%81%E8%A7%92%E5%BA%A6%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3glide%EF%BC%88%E4%B8%8A%EF%BC%89/)中，我们已经把Glide加载图片的基本流程走了一遍，想必你已经对Glide的加载原理有了新的认识并且见识到了Glide源码的复杂逻辑，在我们感叹Glide源码复杂的同时我们也忽略了Glide加载图片过程的其它细节，特别是缓存方面，我们在上一篇文章中对于缓存的处理都是跳过的，这一篇文章我们就从Glide的缓存开始再次对Glide进行深入理解。
