@@ -8,6 +8,7 @@ tags:
 - 图片加载
 - Android
 - 源码分析
+top: true
 ---
 ![image](https://raw.githubusercontent.com/bumptech/glide/master/static/glide_logo.png)
 > 谈到Glide，从英文字面意思有滑行、滑动的意思；而Android从开发的角度我们知道它是一款图片加载框架，这里引用官方文档的一句话“Glide是一个快速高效的Android图片加载库，注重于平滑的滚动”，从官方文档介绍我们了解到用Glide框架来加载图片是快速并且高效的，接下来就来通过简单使用Glide和源码理解两个方面看看Glide是否是快速和高效（文中代码基于Glide 4.8版本）。
