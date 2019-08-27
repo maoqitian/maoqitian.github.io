@@ -5,7 +5,7 @@ categories:
 - Android热门框架解析 #分类
 tags:
 - HTTP
-- Retrofit2.0
+- Retrofit2
 - OKHttp3
 - 源码分析
 - 代理模式
