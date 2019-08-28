@@ -11,11 +11,11 @@ tags:
 - Dagger2
 top: true
 ---
-[![License](https://img.shields.io/badge/license-Apache%202-green.svg)](https://www.apache.org/licenses/LICENSE-2.0)<img src="https://img.shields.io/badge/Android-1.0.0-blue.svg" align=left />
+[![License](https://img.shields.io/badge/license-Apache%202-green.svg)](https://www.apache.org/licenses/LICENSE-2.0)<img src="https://img.shields.io/badge/Android-1.0.1-blue.svg" align=left />
 > 项目地址 [https://github.com/maoqitian/MaoWanAndoidClient](https://github.com/maoqitian/MaoWanAndoidClient)
 # MaoWanAndoidClient
 ## 项目简介
-- 首先感谢[**鸿洋**](https://github.com/hongyangAndroid)大佬提供的[玩Android开放API](https://www.wanandroid.com/blog/show/2)，这是一款Android原生的开源**玩Android**客户端App，提供更丰富的功能，更好体验，旨在更好的浏览[https://www.wanandroid.com/](https://www.wanandroid.com/)网站内容，更好的在手机上进行学习。项目使用**Retrofit2 + RxJava2 + Dagger2 +MVP+RxBus**架构，尽量使用**Material Design**控件进行开发。如果觉得本项目对你有帮助，希望您给我一个点一个**Star**. 
+- 首先感谢[**鸿洋**](https://github.com/hongyangAndroid)大佬提供的[玩Android开放API](https://www.wanandroid.com/blog/show/2)，这是一款有较好用户体验的开源**玩Android客户端。**提供丰富完整的功能，更好的体验，旨在更好的浏览[https://www.wanandroid.com/](https://www.wanandroid.com/)网站内容，更好的在手机上进行学习。项目使用**Retrofit2 + RxJava2 + Dagger2 +MVP+RxBus**架构，尽量使用**Material Design**控件进行开发。如果觉得本项目对你有帮助，希望您给我一个点一个**Star**. 
 - 下载本项目建议clone master分支,clone 本项目之后需编译生成dagger对应文件。
 ## 项目基本架构
 ![MVP-WanAndroid-Architecture](https://raw.githubusercontent.com/maoqitian/MaoMdPhoto/master/WanAndroid/MVP-WanAndroid-Architecture1.jpg)
@@ -114,19 +114,20 @@ top: true
 
 # 版本下载体验
 - [**历史版本下载地址**](https://github.com/maoqitian/MaoWanAndoidClient/releases)
-- **最新版本下载二维码**
-
-![downloadApk](https://github.com/maoqitian/MaoWanAndoidClient/raw/master/preview/donwloadApk-v1.0.0.png)
+### **最新版本下载二维码**
+- 可以手机浏览器输入以下地址下载 [https://fir.im/kgy2](https://fir.im/kgy2)
+![downloadApk](https://github.com/maoqitian/MaoMdPhoto/raw/master/WanAndroid/downloadApk-v1.0.1.jpg)
 
 # 版本更新日志
 
-## v1.0.1 (2019/8/27)
+## v1.0.1 (2019/8/29)
 ### 完善收藏模块功能
 - 收藏站外文章
 - 收藏网站列表
 - 收藏网址
 - 编辑收藏网站
 - 删除收藏网站
+- 修复上个版本存在的bug
 
 ## v1.0.0 (2019/8/15)
 - 项目第一个版本， 完成WanAndroid基本功能
