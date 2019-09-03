@@ -11,7 +11,7 @@ tags:
 - Dagger2
 top: true
 ---
-[![License](https://img.shields.io/badge/license-Apache%202-green.svg)](https://www.apache.org/licenses/LICENSE-2.0)<img src="https://img.shields.io/badge/Android-1.0.1-blue.svg" align=left />
+[![License](https://img.shields.io/badge/license-Apache%202-green.svg)](https://www.apache.org/licenses/LICENSE-2.0)<img src="https://img.shields.io/badge/Android-1.0.1-blue.svg" />
 > 项目地址 [https://github.com/maoqitian/MaoWanAndoidClient](https://github.com/maoqitian/MaoWanAndoidClient)
 # MaoWanAndoidClient
 ## 项目简介
@@ -75,7 +75,12 @@ top: true
 ### 收藏
 - 收藏文章列表
 - 收藏站内文章
+- 收藏站外文章
 - 取消收藏
+- 收藏网站列表
+- 收藏网址
+- 编辑收藏网站
+- 删除收藏网站
 
 ### 搜索
 - 首页文章搜索
