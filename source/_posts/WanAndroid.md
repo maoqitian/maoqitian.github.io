@@ -11,7 +11,7 @@ tags:
 - Dagger2
 top: true
 ---
-[![License](https://img.shields.io/badge/license-Apache%202-green.svg)](https://www.apache.org/licenses/LICENSE-2.0)<img src="https://img.shields.io/badge/Android-1.0.1-blue.svg" />
+[![License](https://img.shields.io/badge/license-Apache%202-green.svg)](https://www.apache.org/licenses/LICENSE-2.0)<img src="https://img.shields.io/badge/Android-1.0.3-blue.svg" />
 > 项目地址 [https://github.com/maoqitian/MaoWanAndoidClient](https://github.com/maoqitian/MaoWanAndoidClient)
 # MaoWanAndoidClient
 ## 项目简介
@@ -24,6 +24,7 @@ top: true
 [**玩Android开放API**](https://www.wanandroid.com/blog/show/2)
 ## 项目gif、截图展示
 <img src="https://github.com/maoqitian/MaoWanAndoidClient/raw/master/preview/show.gif"  height="300" width="170">
+<img src="https://raw.githubusercontent.com/maoqitian/MaoWanAndoidClient/dev/preview/usercenter.gif"  height="300" width="170">
 <img src="https://github.com/maoqitian/MaoWanAndoidClient/raw/master/preview/homePage.jpg"  height="300" width="170"> 
 <img src="https://github.com/maoqitian/MaoWanAndoidClient/raw/master/preview/knowledge.jpg"  height="300" width="170">
 <img src="https://github.com/maoqitian/MaoWanAndoidClient/raw/master/preview/search.jpg"  height="300" width="170">
@@ -121,9 +122,22 @@ top: true
 - [**历史版本下载地址**](https://github.com/maoqitian/MaoWanAndoidClient/releases)
 ### **最新版本下载二维码**
 - 可以手机浏览器输入以下地址下载 [https://fir.im/kgy2](https://fir.im/kgy2)
-![downloadApk](https://github.com/maoqitian/MaoMdPhoto/raw/master/WanAndroid/downloadApk-v1.0.1.jpg)
+![downloadApk](https://raw.githubusercontent.com/maoqitian/MaoMdPhoto/master/WanAndroid/downloadApk-v1.0.3.png)
 
 # 版本更新日志
+
+## v1.0.3 (2019/9/9)
+### 新增个人中心模块
+- 点击头像进入个人中心，仿B站个人中心效果
+- 文章浏览页面增加收藏功能
+- 修复上个版本存在的bug
+
+## v1.0.2 (2019/9/3)
+### 新增我的积分模块
+- 获取个人积分
+- 获取个人积分获取列表
+- 登录之后侧拉Drawer 显示等级和积分
+- 修复上个版本存在的bug
 
 ## v1.0.1 (2019/8/29)
 ### 完善收藏模块功能
