@@ -11,7 +11,7 @@ tags:
 - Dagger2
 top: true
 ---
-[![License](https://img.shields.io/badge/license-Apache%202-green.svg)](https://www.apache.org/licenses/LICENSE-2.0)<img src="https://img.shields.io/badge/Android-1.0.3-blue.svg" />
+[![License](https://img.shields.io/badge/license-Apache%202-green.svg)](https://www.apache.org/licenses/LICENSE-2.0)<img src="https://img.shields.io/badge/Android-1.0.4-blue.svg" />
 > 项目地址 [https://github.com/maoqitian/MaoWanAndoidClient](https://github.com/maoqitian/MaoWanAndoidClient)
 # MaoWanAndoidClient
 ## 项目简介
@@ -36,7 +36,7 @@ top: true
 <img src="https://github.com/maoqitian/MaoWanAndoidClient/raw/master/preview/commonWeb.jpg"  height="300" width="170">
 <img src="https://github.com/maoqitian/MaoWanAndoidClient/raw/master/preview/collect.jpg"  height="300" width="170">
 
-<img src="https://github.com/maoqitian/MaoWanAndoidClient/raw/master/preview/drawer.jpg"  height="300" width="170">
+<img src="https://raw.githubusercontent.com/maoqitian/MaoMdPhoto/master/WanAndroid/newdawer.jpg"  height="300" width="170">
 <img src="https://github.com/maoqitian/MaoWanAndoidClient/raw/master/preview/login.jpg"  height="300" width="170">
 <img src="https://github.com/maoqitian/MaoWanAndoidClient/raw/master/preview/loginout.jpg"  height="300" width="170">
 <img src="https://github.com/maoqitian/MaoWanAndoidClient/raw/master/preview/webviewPage.jpg"  height="300" width="170">
@@ -93,6 +93,9 @@ top: true
 - 版本信息
 - 退出登录
 
+### 个人中心
+- 点击头像进入个人中心，仿B站个人中心效果
+
 # Thanks
 ## 参考项目
 - [GeekNews](https://github.com/codeestX/GeekNews)
@@ -122,24 +125,29 @@ top: true
 - [**历史版本下载地址**](https://github.com/maoqitian/MaoWanAndoidClient/releases)
 ### **最新版本下载二维码**
 - 可以手机浏览器输入以下地址下载 [https://fir.im/kgy2](https://fir.im/kgy2)
-![downloadApk](https://raw.githubusercontent.com/maoqitian/MaoMdPhoto/master/WanAndroid/downloadApk-v1.0.3.png)
+![downloadApk](https://raw.githubusercontent.com/maoqitian/MaoMdPhoto/master/WanAndroid/downloadApk-v1.0.4.png)
 
 # 版本更新日志
+## v1.0.4 (2019/09/18)
+### 新增积分排行榜模块
+- 添加积分排行榜入口，并完成数据展示页面，支持下拉刷新，加载更多
+- 添加关于我们页面
+- 修复上个版本存在的bug
 
-## v1.0.3 (2019/9/9)
+## v1.0.3 (2019/09/09)
 ### 新增个人中心模块
 - 点击头像进入个人中心，仿B站个人中心效果
 - 文章浏览页面增加收藏功能
 - 修复上个版本存在的bug
 
-## v1.0.2 (2019/9/3)
+## v1.0.2 (2019/09/03)
 ### 新增我的积分模块
 - 获取个人积分
 - 获取个人积分获取列表
 - 登录之后侧拉Drawer 显示等级和积分
 - 修复上个版本存在的bug
 
-## v1.0.1 (2019/8/29)
+## v1.0.1 (2019/08/29)
 ### 完善收藏模块功能
 - 收藏站外文章
 - 收藏网站列表
@@ -148,7 +156,7 @@ top: true
 - 删除收藏网站
 - 修复上个版本存在的bug
 
-## v1.0.0 (2019/8/15)
+## v1.0.0 (2019/08/15)
 - 项目第一个版本， 完成WanAndroid基本功能
 
 # Statement
