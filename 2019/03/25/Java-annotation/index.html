@@ -1,0 +1,1608 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-center-atom.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i["DaoVoiceObject"]=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;a.charset="utf-8";m.parentNode.insertBefore(a,m)})(window,document,"script",('https:' == document.location.protocol ? 'https:' : 'http:') + "//widget.daovoice.io/widget/aa90d435.js","daovoice")
+  daovoice('init', {
+      app_id: "aa90d435"
+    });
+  daovoice('update');
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic|PT Mono:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Java,annotation,反射,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="maoqitian 个人博客" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="关于注解首先引入官方文档的一句话：Java 注解用于为 Java 代码提供元数据。作为元数据，注解不直接影响你的代码执行，但也有一些类型的注解实际上可以用于这一目的。Java 注解是从 Java5 开始添加到 Java 的。看完这句话也许你还是一脸懵逼，接下我将从注解的定义、元注解、注解属性、自定义注解、注解解析JDK 提供的注解这几个方面再次了解注解（Annotation）">
+<meta name="keywords" content="Java,annotation,反射">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java注解完全解析回顾">
+<meta property="og:url" content="https://www.maoqitian.com/2019/03/25/Java-annotation/index.html">
+<meta property="og:site_name" content="maoqitian 个人博客">
+<meta property="og:description" content="关于注解首先引入官方文档的一句话：Java 注解用于为 Java 代码提供元数据。作为元数据，注解不直接影响你的代码执行，但也有一些类型的注解实际上可以用于这一目的。Java 注解是从 Java5 开始添加到 Java 的。看完这句话也许你还是一脸懵逼，接下我将从注解的定义、元注解、注解属性、自定义注解、注解解析JDK 提供的注解这几个方面再次了解注解（Annotation）">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://github.com/maoqitian/MaoMdPhoto/raw/master/Java%E6%B3%A8%E8%A7%A3%E5%AE%8C%E5%85%A8%E8%A7%A3%E6%9E%90/Java%E4%B8%AD%E6%96%B0%E5%BB%BA%E7%B1%BB.png">
+<meta property="og:image" content="https://github.com/maoqitian/MaoMdPhoto/raw/master/Java%E6%B3%A8%E8%A7%A3%E5%AE%8C%E5%85%A8%E8%A7%A3%E6%9E%90/%E8%8E%B7%E5%8F%96%E6%B3%A8%E8%A7%A3%E5%B1%9E%E6%80%A7%E8%BF%90%E8%A1%8C%E7%BB%93%E6%9E%9C.png">
+<meta property="og:image" content="https://github.com/maoqitian/MaoMdPhoto/raw/master/Java%E6%B3%A8%E8%A7%A3%E5%AE%8C%E5%85%A8%E8%A7%A3%E6%9E%90/%E8%BD%AC%E8%B4%A6%E5%A4%84%E7%90%86%E8%BF%90%E8%A1%8C%E7%BB%93%E6%9E%9C.png">
+<meta property="og:updated_time" content="2020-10-15T14:26:43.686Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java注解完全解析回顾">
+<meta name="twitter:description" content="关于注解首先引入官方文档的一句话：Java 注解用于为 Java 代码提供元数据。作为元数据，注解不直接影响你的代码执行，但也有一些类型的注解实际上可以用于这一目的。Java 注解是从 Java5 开始添加到 Java 的。看完这句话也许你还是一脸懵逼，接下我将从注解的定义、元注解、注解属性、自定义注解、注解解析JDK 提供的注解这几个方面再次了解注解（Annotation）">
+<meta name="twitter:image" content="https://github.com/maoqitian/MaoMdPhoto/raw/master/Java%E6%B3%A8%E8%A7%A3%E5%AE%8C%E5%85%A8%E8%A7%A3%E6%9E%90/Java%E4%B8%AD%E6%96%B0%E5%BB%BA%E7%B1%BB.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":true},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://www.maoqitian.com/2019/03/25/Java-annotation/">
+
+
+
+
+
+  <title>Java注解完全解析回顾 | maoqitian 个人博客</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+	<!--  -->
+    <a href="https://github.com/maoqitian" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewbox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">maoqitian 个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.maoqitian.com/2019/03/25/Java-annotation/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="maoqitian">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="maoqitian 个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Java注解完全解析回顾</h1>
+        
+
+        <div class="post-meta">
+		   
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-03-25T23:30:54+08:00">
+                2019-03-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java基础回顾/" itemprop="url" rel="index">
+                    <span itemprop="name">Java基础回顾</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2019/03/25/Java-annotation/" class="leancloud_visitors" data-flag-title="Java注解完全解析回顾">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  3.1k字
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  12分钟
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>关于注解首先引入官方文档的一句话：Java 注解用于为 Java 代码提供元数据。作为元数据，注解不直接影响你的代码执行，但也有一些类型的注解实际上可以用于这一目的。Java 注解是从 Java5 开始添加到 Java 的。看完这句话也许你还是一脸懵逼，接下我将从注解的定义、元注解、注解属性、自定义注解、注解解析JDK 提供的注解这几个方面再次了解注解（Annotation）<br><a id="more"></a></p>
+</blockquote>
+<h2 id="注解的定义"><a href="#注解的定义" class="headerlink" title="注解的定义"></a>注解的定义</h2><ul>
+<li>日常开发中新建Java类，我们使用class、interface比较多，而注解和它们一样，也是一种类的类型，他是用的修饰符为 @interface</li>
+</ul>
+<p><img src="https://github.com/maoqitian/MaoMdPhoto/raw/master/Java%E6%B3%A8%E8%A7%A3%E5%AE%8C%E5%85%A8%E8%A7%A3%E6%9E%90/Java%E4%B8%AD%E6%96%B0%E5%BB%BA%E7%B1%BB.png" alt="Java中新建类"></p>
+<h3 id="注解类的写法"><a href="#注解类的写法" class="headerlink" title="注解类的写法"></a>注解类的写法</h3><ul>
+<li><p>我们新建一个注解MyTestAnnotation</p>
+<figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> @<span class="class"><span class="keyword">interface</span> <span class="title">MyTestAnnotation</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>接着我们就可以在类或者方法上作用我们刚刚新建的注解</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@MyTestAnnotation</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">test</span> </span>&#123;</span><br><span class="line">   <span class="meta">@MyTestAnnotation</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span></span>&#123;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>以上我们只是了解了注解的写法，但是我们定义的注解中还没写任何代码，现在这个注解毫无意义，要如何使注解工作呢？接下来我们接着了解元注解。</p>
+<h2 id="元注解"><a href="#元注解" class="headerlink" title="元注解"></a>元注解</h2></li>
+<li>元注解顾名思义我们可以理解为注解的注解，它是作用在注解中，方便我们使用注解实现想要的功能。元注解分别有@Retention、 @Target、 @Document、 @Inherited和@Repeatable（JDK1.8加入）五种。<h3 id="Retention"><a href="#Retention" class="headerlink" title="@Retention"></a>@Retention</h3></li>
+<li>Retention英文意思有保留、保持的意思，它表示注解存在阶段是保留在源码（编译期），字节码（类加载）或者运行期（JVM中运行）。在@Retention注解中使用枚举RetentionPolicy来表示注解保留时期</li>
+<li>@Retention(RetentionPolicy.SOURCE)，注解仅存在于源码中，在class字节码文件中不包含</li>
+<li>@Retention(RetentionPolicy.CLASS)， 默认的保留策略，注解会在class字节码文件中存在，但运行时无法获得</li>
+<li>@Retention(RetentionPolicy.RUNTIME)， 注解会在class字节码文件中存在，在运行时可以通过反射获取到</li>
+<li>如果我们是自定义注解，则通过前面分析，我们自定义注解如果只存着源码中或者字节码文件中就无法发挥作用，而在运行期间能获取到注解才能实现我们目的，所以自定义注解中肯定是使用 <strong>@Retention(RetentionPolicy.RUNTIME)</strong><figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">@Retention</span>(RetentionPolicy.RUNTIME)</span><br><span class="line">public <span class="variable">@interface</span> MyTestAnnotation &#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="Target"><a href="#Target" class="headerlink" title="@Target"></a>@Target</h3><ul>
+<li>Target的英文意思是目标，这也很容易理解，使用@Target元注解表示我们的注解作用的范围就比较具体了，可以是类，方法，方法参数变量等，同样也是通过枚举类ElementType表达作用类型</li>
+<li>@Target(ElementType.TYPE) 作用接口、类、枚举、注解</li>
+<li>@Target(ElementType.FIELD) 作用属性字段、枚举的常量</li>
+<li>@Target(ElementType.METHOD) 作用方法</li>
+<li>@Target(ElementType.PARAMETER) 作用方法参数</li>
+<li>@Target(ElementType.CONSTRUCTOR)  作用构造函数</li>
+<li>@Target(ElementType.LOCAL_VARIABLE)作用局部变量</li>
+<li>@Target(ElementType.ANNOTATION_TYPE)作用于注解（@Retention注解中就使用该属性）</li>
+<li>@Target(ElementType.PACKAGE) 作用于包 </li>
+<li>@Target(ElementType.TYPE_PARAMETER) 作用于类型泛型，即泛型方法、泛型类、泛型接口 （jdk1.8加入）</li>
+<li>@Target(ElementType.TYPE_USE) 类型使用.可以用于标注任意类型除了 class （jdk1.8加入）</li>
+<li>一般比较常用的是ElementType.TYPE类型<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">@Retention</span>(RetentionPolicy.RUNTIME)</span><br><span class="line"><span class="variable">@Target</span>(ElementType.TYPE)</span><br><span class="line">public <span class="variable">@interface</span> MyTestAnnotation &#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="Documented"><a href="#Documented" class="headerlink" title="@Documented"></a>@Documented</h3><ul>
+<li>Document的英文意思是文档。它的作用是能够将注解中的元素包含到 Javadoc 中去。<h3 id="Inherited"><a href="#Inherited" class="headerlink" title="@Inherited"></a>@Inherited</h3></li>
+<li>Inherited的英文意思是继承，但是这个继承和我们平时理解的继承大同小异，一个被@Inherited注解了的注解修饰了一个父类，如果他的子类没有被其他注解修饰，则它的子类也继承了父类的注解。</li>
+<li>下面我们来看个@Inherited注解例子</li>
+</ul>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**自定义注解*/</span></span><br><span class="line"><span class="meta">@Documented</span></span><br><span class="line"><span class="meta">@Inherited</span></span><br><span class="line"><span class="meta">@Retention</span>(<span class="type">RetentionPolicy</span>.<span class="type">RUNTIME</span>)</span><br><span class="line"><span class="meta">@Target</span>(<span class="type">ElementType</span>.<span class="type">TYPE</span>)</span><br><span class="line">public <span class="meta">@interface</span> <span class="type">MyTestAnnotation</span> &#123;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/**父类标注自定义注解*/</span></span><br><span class="line"><span class="meta">@MyTestAnnotation</span></span><br><span class="line">public <span class="class"><span class="keyword">class</span> <span class="title">Father</span> </span>&#123;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/**子类*/</span></span><br><span class="line">public <span class="class"><span class="keyword">class</span> <span class="title">Son</span> <span class="keyword">extends</span> <span class="title">Father</span> </span>&#123;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/**测试子类获取父类自定义注解*/</span></span><br><span class="line">public <span class="class"><span class="keyword">class</span> <span class="title">test</span> </span>&#123;</span><br><span class="line">   public static void main(<span class="type">String</span>[] args)&#123;</span><br><span class="line"></span><br><span class="line">      <span class="comment">//获取Son的class对象</span></span><br><span class="line">       <span class="type">Class</span>&lt;<span class="type">Son</span>&gt; sonClass = <span class="type">Son</span>.<span class="keyword">class</span>;</span><br><span class="line">      <span class="comment">// 获取Son类上的注解MyTestAnnotation可以执行成功</span></span><br><span class="line">      <span class="type">MyTestAnnotation</span> annotation = sonClass.getAnnotation(<span class="type">MyTestAnnotation</span>.<span class="keyword">class</span>);</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Repeatable"><a href="#Repeatable" class="headerlink" title="@Repeatable"></a>@Repeatable</h3><ul>
+<li>Repeatable的英文意思是可重复的。顾名思义说明被这个元注解修饰的注解可以同时作用一个对象多次，但是每次作用注解又可以代表不同的含义。</li>
+<li>下面我们看一个人玩游戏的例子</li>
+</ul>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**一个人喜欢玩游戏，他喜欢玩英雄联盟，绝地求生，极品飞车，尘埃4等，则我们需要定义一个人的注解，他属性代表喜欢玩游戏集合，一个游戏注解，游戏属性代表游戏名称*/</span></span><br><span class="line"><span class="comment">/**玩家注解*/</span></span><br><span class="line"><span class="meta">@Documented</span></span><br><span class="line"><span class="meta">@Retention(RetentionPolicy.RUNTIME)</span></span><br><span class="line"><span class="meta">@Target(ElementType.TYPE)</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> People &#123;</span><br><span class="line">    Game[] value() ;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/**游戏注解*/</span></span><br><span class="line"><span class="meta">@Repeatable(People.class)</span></span><br><span class="line"><span class="meta">@Retention(RetentionPolicy.RUNTIME)</span></span><br><span class="line"><span class="meta">@Target(ElementType.TYPE)</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Game &#123;</span><br><span class="line">    String value() <span class="keyword">default</span> <span class="string">""</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/**玩游戏类*/</span></span><br><span class="line"><span class="meta">@Game(value = <span class="meta-string">"LOL"</span>)</span></span><br><span class="line"><span class="meta">@Game(value = <span class="meta-string">"PUBG"</span>)</span></span><br><span class="line"><span class="meta">@Game(value = <span class="meta-string">"NFS"</span>)</span></span><br><span class="line"><span class="meta">@Game(value = <span class="meta-string">"Dirt4"</span>)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PlayGame</span> </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>通过上面的例子，你可能会有一个疑问，游戏注解中括号的变量是啥，其实这和游戏注解中定义的属性对应。接下来我们继续学习注解的属性。<h2 id="注解的属性"><a href="#注解的属性" class="headerlink" title="注解的属性"></a>注解的属性</h2></li>
+<li>通过上一小节@Repeatable注解的例子，我们说到注解的属性。注解的属性其实和类中定义的变量有异曲同工之处，只是注解中的变量都是成员变量（属性），并且注解中是没有方法的，只有成员变量，变量名就是使用注解括号中对应的参数名，变量返回值注解括号中对应参数类型。相信这会你应该会对上面的例子有一个更深的认识。而@Repeatable注解中的变量则类型则是对应Annotation（接口）的泛型Class。<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**注解Repeatable源码*/</span></span><br><span class="line"><span class="meta">@Documented</span></span><br><span class="line"><span class="meta">@Retention(RetentionPolicy.RUNTIME)</span></span><br><span class="line"><span class="meta">@Target(ElementType.ANNOTATION_TYPE)</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Repeatable &#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Indicates the &lt;em&gt;containing annotation type&lt;/em&gt; for the</span></span><br><span class="line"><span class="comment">     * repeatable annotation type.</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> the containing annotation type</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    Class&lt;? extends Annotation&gt; value();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="注解的本质"><a href="#注解的本质" class="headerlink" title="注解的本质"></a>注解的本质</h3><ul>
+<li>注解的本质就是一个Annotation接口</li>
+</ul>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**Annotation接口源码*/</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Annotation</span> </span>&#123;</span><br><span class="line">   </span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">equals</span><span class="params">(Object obj)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">hashCode</span><span class="params">()</span></span>;</span><br><span class="line">    </span><br><span class="line">    Class&lt;? <span class="keyword">extends</span> Annotation&gt; annotationType();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>通过以上源码，我们知道注解本身就是Annotation接口的子接口，<strong>也就是说注解中其实是可以有属性和方法，但是接口中的属性都是static final的，对于注解来说没什么意义，而我们定义接口的方法就相当于注解的属性，也就对应了前面说的为什么注解只有属性成员变量，其实他就是接口的方法，这就是为什么成员变量会有括号</strong>，不同于接口我们可以在注解的括号中给成员变量赋值。<h3 id="注解属性类型"><a href="#注解属性类型" class="headerlink" title="注解属性类型"></a>注解属性类型</h3></li>
+<li>注解属性类型可以有以下列出的类型</li>
+<li>1.基本数据类型</li>
+<li>2.String</li>
+<li>3.枚举类型</li>
+<li>4.注解类型</li>
+<li>5.Class类型</li>
+<li>6.以上类型的一维数组类型<h3 id="注解成员变量赋值"><a href="#注解成员变量赋值" class="headerlink" title="注解成员变量赋值"></a>注解成员变量赋值</h3></li>
+<li>如果注解又多个属性，则可以在注解括号中用“，”号隔开分别给对应的属性赋值，如下例子，注解在父类中赋值属性<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Documented</span></span><br><span class="line"><span class="meta">@Inherited</span></span><br><span class="line"><span class="meta">@Retention(RetentionPolicy.RUNTIME)</span></span><br><span class="line"><span class="meta">@Target(ElementType.TYPE)</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> MyTestAnnotation &#123;</span><br><span class="line">    String name() <span class="keyword">default</span> <span class="string">"mao"</span>;</span><br><span class="line">    int age() <span class="keyword">default</span> <span class="number">18</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@MyTestAnnotation(name = <span class="meta-string">"father"</span>,age = 50)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Father</span> </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="获取注解属性"><a href="#获取注解属性" class="headerlink" title="获取注解属性"></a>获取注解属性</h3><ul>
+<li>前面我们说了很多注解如何定义，放在哪，现在我们可以开始学习注解属性的提取了，这才是使用注解的关键，获取属性的值才是使用注解的目的。</li>
+<li><p>如果获取注解属性，当然是反射啦，主要有三个基本的方法</p>
+<figure class="highlight zephir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**是否存在对应 Annotation 对象*/</span></span><br><span class="line"> <span class="keyword">public</span> <span class="keyword">boolean</span> isAnnotationPresent(<span class="class"><span class="keyword">Class</span>&lt;? <span class="keyword">extends</span> <span class="title">Annotation</span>&gt; <span class="title">annotationClass</span>) </span>&#123;</span><br><span class="line">       <span class="keyword">return</span> GenericDeclaration.super.isAnnotationPresent(annotationClass);</span><br><span class="line">   &#125;</span><br><span class="line"> </span><br><span class="line"><span class="comment">/**获取 Annotation 对象*/</span></span><br><span class="line">   <span class="keyword">public</span> &lt;A extends Annotation&gt; A getAnnotation(<span class="class"><span class="keyword">Class</span>&lt;<span class="title">A</span>&gt; <span class="title">annotationClass</span>) </span>&#123;</span><br><span class="line">       Objects.requireNonNull(annotationClass);</span><br><span class="line"></span><br><span class="line">       <span class="keyword">return</span> (A) annotationData().annotations.get(annotationClass);</span><br><span class="line">   &#125;</span><br><span class="line"><span class="comment">/**获取所有 Annotation 对象数组*/</span>   </span><br><span class="line"><span class="keyword">public</span> Annotation[] getAnnotations() &#123;</span><br><span class="line">       <span class="keyword">return</span> AnnotationParser.toArray(annotationData().annotations);</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>下面结合前面的例子，我们来获取一下注解属性，在获取之前我们自定义的注解必须使用元注解@Retention(RetentionPolicy.RUNTIME) </p>
+<figure class="highlight ceylon"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">public <span class="keyword">class</span> test &#123;</span><br><span class="line">   public static <span class="keyword">void</span> main(String[] args) <span class="meta">throws</span> NoSuchMethodException &#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * 获取类注解属性</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        Class&lt;Father&gt; fatherClass = Father.<span class="keyword">class</span>;</span><br><span class="line">        boolean annotationPresent = fatherClass.isAnnotationPresent(MyTestAnnotation.<span class="keyword">class</span>);</span><br><span class="line">        <span class="keyword">if</span>(annotationPresent)&#123;</span><br><span class="line">            MyTestAnnotation <span class="keyword">annotation</span> = fatherClass.getAnnotation(MyTestAnnotation.<span class="keyword">class</span>);</span><br><span class="line">            System.<span class="keyword">out</span>.println(<span class="keyword">annotation</span>.name());</span><br><span class="line">            System.<span class="keyword">out</span>.println(<span class="keyword">annotation</span>.age());</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * 获取方法注解属性</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            Field age = fatherClass.getDeclaredField(<span class="string">"age"</span>);</span><br><span class="line">            boolean annotationPresent<span class="number">1</span> = age.isAnnotationPresent(Age.<span class="keyword">class</span>);</span><br><span class="line">            <span class="keyword">if</span>(annotationPresent<span class="number">1</span>)&#123;</span><br><span class="line">                Age <span class="keyword">annotation</span> = age.getAnnotation(Age.<span class="keyword">class</span>);</span><br><span class="line">                System.<span class="keyword">out</span>.println(<span class="keyword">annotation</span>.<span class="keyword">value</span>());</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            Method play = PlayGame.<span class="keyword">class</span>.getDeclaredMethod(<span class="string">"play"</span>);</span><br><span class="line">            <span class="keyword">if</span> (play!=null)&#123;</span><br><span class="line">                People <span class="keyword">annotation</span><span class="number">2</span> = play.getAnnotation(People.<span class="keyword">class</span>);</span><br><span class="line">                Game[] <span class="keyword">value</span> = <span class="keyword">annotation</span><span class="number">2</span>.<span class="keyword">value</span>();</span><br><span class="line">                <span class="keyword">for</span> (Game game : <span class="keyword">value</span>) &#123;</span><br><span class="line">                    System.<span class="keyword">out</span>.println(game.<span class="keyword">value</span>());</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (NoSuchFieldException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>运行结果：</p>
+<p><img src="https://github.com/maoqitian/MaoMdPhoto/raw/master/Java%E6%B3%A8%E8%A7%A3%E5%AE%8C%E5%85%A8%E8%A7%A3%E6%9E%90/%E8%8E%B7%E5%8F%96%E6%B3%A8%E8%A7%A3%E5%B1%9E%E6%80%A7%E8%BF%90%E8%A1%8C%E7%BB%93%E6%9E%9C.png" alt="获取注解属性运行结果"></p>
+<h2 id="JDK-提供的注解"><a href="#JDK-提供的注解" class="headerlink" title="JDK 提供的注解"></a>JDK 提供的注解</h2><table>
+<thead>
+<tr>
+<th>注解</th>
+<th>作用</th>
+<th>注意事项</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>@Override</td>
+<td>它是用来描述当前方法是一个重写的方法，在编译阶段对方法进行检查</td>
+<td>jdk1.5中它只能描述继承中的重写，jdk1.6中它可以描述接口实现的重写,也能描述类的继承的重写</td>
+</tr>
+<tr>
+<td>@Deprecated</td>
+<td>它是用于描述当前方法是一个过时的方法</td>
+<td>无</td>
+</tr>
+<tr>
+<td>@SuppressWarnings</td>
+<td>对程序中的警告去除。</td>
+<td>无</td>
+</tr>
+</tbody>
+</table>
+<h2 id="注解作用与应用"><a href="#注解作用与应用" class="headerlink" title="注解作用与应用"></a>注解作用与应用</h2><ul>
+<li><p>现在我们再次回头看看开头官方文档的那句描述</p>
+<blockquote>
+<p>Java 注解用于为 Java 代码提供元数据。作为元数据，注解不直接影响你的代码执行，但也有一些类型的注解实际上可以用于这一目的。</p>
+</blockquote>
+</li>
+<li><p>经过我们前面的了解，注解其实是个很方便的东西，它存活的时间，作用的区域都可以由你方便设置，只是你用注解来干嘛的问题</p>
+</li>
+</ul>
+<h3 id="使用注解进行参数配置"><a href="#使用注解进行参数配置" class="headerlink" title="使用注解进行参数配置"></a>使用注解进行参数配置</h3><ul>
+<li>下面我们看一个银行转账的例子，假设银行有个转账业务，转账的限额可能会根据汇率的变化而变化，我们可以利用注解灵活配置转账的限额，而不用每次都去修改我们的业务代码。<figure class="highlight d"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**定义限额注解*/</span></span><br><span class="line"><span class="keyword">@Documented</span></span><br><span class="line"><span class="keyword">@Retention</span>(RetentionPolicy.RUNTIME)</span><br><span class="line"><span class="keyword">@Target</span>(ElementType.METHOD)</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">@interface</span> BankTransferMoney &#123;</span><br><span class="line">    <span class="built_in">double</span> maxMoney() <span class="keyword">default</span> <span class="number">10000</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/**转账处理业务类*/</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> BankService &#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * @param money 转账金额</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">@BankTransferMoney</span>(maxMoney = <span class="number">15000</span>)</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> TransferMoney(<span class="built_in">double</span> money)&#123;</span><br><span class="line">        System.<span class="keyword">out</span>.println(processAnnotationMoney(money));</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> String processAnnotationMoney(<span class="built_in">double</span> money) &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            Method transferMoney = BankService.<span class="keyword">class</span>.getDeclaredMethod(<span class="string">"TransferMoney"</span>,<span class="built_in">double</span>.<span class="keyword">class</span>);</span><br><span class="line">            boolean annotationPresent = transferMoney.isAnnotationPresent(BankTransferMoney.<span class="keyword">class</span>);</span><br><span class="line">            <span class="keyword">if</span>(annotationPresent)&#123;</span><br><span class="line">                BankTransferMoney annotation = transferMoney.getAnnotation(BankTransferMoney.<span class="keyword">class</span>);</span><br><span class="line">                <span class="built_in">double</span> l = annotation.maxMoney();</span><br><span class="line">                <span class="keyword">if</span>(money&gt;l)&#123;</span><br><span class="line">                   <span class="keyword">return</span> <span class="string">"转账金额大于限额，转账失败"</span>;</span><br><span class="line">                &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="keyword">return</span><span class="string">"转账金额为:"</span>+money+<span class="string">"，转账成功"</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> ( NoSuchMethodException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"转账处理失败"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> main(String[] args)&#123;</span><br><span class="line">        TransferMoney(<span class="number">10000</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>运行结果：</p>
+<p><img src="https://github.com/maoqitian/MaoMdPhoto/raw/master/Java%E6%B3%A8%E8%A7%A3%E5%AE%8C%E5%85%A8%E8%A7%A3%E6%9E%90/%E8%BD%AC%E8%B4%A6%E5%A4%84%E7%90%86%E8%BF%90%E8%A1%8C%E7%BB%93%E6%9E%9C.png" alt="转账处理运行结果"></p>
+<ul>
+<li>通过上面的例子，只要汇率变化，我们就改变注解的配置值就可以直接改变当前最大限额。<h3 id="第三方框架的应用"><a href="#第三方框架的应用" class="headerlink" title="第三方框架的应用"></a>第三方框架的应用</h3></li>
+<li>作为一个Android 开发者，平常我们所使用的第三方框架ButterKnife，Retrofit2，Dagger2等都有注解的应用，如果我们要了解这些框架的原理，则注解的基础知识则是必不可少的。<h3 id="注解的作用"><a href="#注解的作用" class="headerlink" title="注解的作用"></a>注解的作用</h3></li>
+<li>提供信息给编译器： 编译器可以利用注解来检测出错误或者警告信息，打印出日志。</li>
+<li>编译阶段时的处理： 软件工具可以用来利用注解信息来自动生成代码、文档或者做其它相应的自动处理。</li>
+<li>运行时处理： 某些注解可以在程序运行的时候接受代码的提取，自动做相应的操作。</li>
+<li>正如官方文档的那句话所说，注解能够提供元数据，转账例子中处理获取注解值的过程是我们开发者直接写的注解提取逻辑，<strong>处理提取和处理 Annotation 的代码统称为 APT（Annotation Processing Tool)</strong>。上面转账例子中的processAnnotationMoney方法就可以理解为APT工具类。</li>
+</ul>
+<h2 id="最后说点"><a href="#最后说点" class="headerlink" title="最后说点"></a>最后说点</h2><p>到此，对于Java中注解的解析就结束了。最后，也非常感谢您阅读我的文章，文章中如果有错误，请大家给我提出来，大家一起学习进步，如果觉得我的文章给予你帮助，也请给我一个喜欢和关注，同时也欢迎访问我的<a href="https://www.maoqitian.com"><strong>个人博客</strong></a>。</p>
+<ul>
+<li><a href="https://github.com/maoqitian/JavaDemo/tree/master/annotationdemo" target="_blank" rel="noopener">文中Demo地址</a></li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+ <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-heart"></i>感谢阅读-------------</div>
+    
+</div>
+
+    
+ </div>	
+
+    
+
+    
+
+    
+      <div>
+        <script src="https://cdn.bootcss.com/jquery/2.0.0/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<ul class="post-copyright">
+  <li class="post-copyright-title">
+    <strong>本文标题：</strong>
+    Java注解完全解析回顾
+  </li>
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    maoqitian
+  </li>
+  <li class="post-copyright-created_at">
+    <strong>发布时间：</strong>
+    2019-03-25
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://www.maoqitian.com/2019/03/25/Java-annotation/" title="Java注解完全解析回顾">https://www.maoqitian.com/2019/03/25/Java-annotation/</a>
+	<span class="copy-path" title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="https://www.maoqitian.com/2019/03/25/Java-annotation/" aria-label="复制成功！"></i></span>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.zh" rel="external nofollow" target="_blank">CC BY-NC-ND 4.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+<script> 
+    var clipboard = new Clipboard('.fa-clipboard');
+    $(".fa-clipboard").click(function(){
+      clipboard.on('success', function(){
+        swal({
+          title: "",
+          text: '复制文章链接成功',
+          icon: "success",
+          showConfirmButton: true
+          });
+	    });
+    });  
+</script>
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"><i class="fa fa-tag"></i> Java</a>
+          
+            <a href="/tags/annotation/" rel="tag"><i class="fa fa-tag"></i> annotation</a>
+          
+            <a href="/tags/反射/" rel="tag"><i class="fa fa-tag"></i> 反射</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/12/从零开始-hexo-个人博客搭建完全指南/" rel="next" title="从零开始 hexo 个人博客搭建完全指南">
+                <i class="fa fa-chevron-left"></i> 从零开始 hexo 个人博客搭建完全指南
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/05/07/git-使用/" rel="prev" title="git 使用">
+                git 使用 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "1",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      },
+      "slide": {
+        "bdImg": "5",
+        "bdPos": "left",
+        "bdTop": "100"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC80MjU2MS8xOTEwOA=="></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+      <div id="sidebar-dimmer"></div>
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="maoqitian">
+            
+              <p class="site-author-name" itemprop="name">maoqitian</p>
+              <p class="site-description motion-element" itemprop="description">“life was like a box a chocolates, never know what you're gonna get.”</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">69</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/maoqitian" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://juejin.im/user/59e956626fb9a045204b57d4" target="_blank" title="掘金">
+                      
+                        <i class="fa fa-fw fa-drupal"></i>掘金</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.jianshu.com/u/f58cd7ff1a08" target="_blank" title="简书">
+                      
+                        <i class="fa fa-fw fa-book"></i>简书</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:maoqitian068@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-pagelines"></i>
+                友情链接
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://www.wanandroid.com/" title="玩Android" target="_blank">玩Android</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://kymjs.com" title="开源实验室" target="_blank">开源实验室</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://liuwangshu.cn/" title="刘望舒的博客" target="_blank">刘望舒的博客</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#注解的定义"><span class="nav-number">1.</span> <span class="nav-text">注解的定义</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#注解类的写法"><span class="nav-number">1.1.</span> <span class="nav-text">注解类的写法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#元注解"><span class="nav-number">2.</span> <span class="nav-text">元注解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Retention"><span class="nav-number">2.1.</span> <span class="nav-text">@Retention</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Target"><span class="nav-number">2.2.</span> <span class="nav-text">@Target</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Documented"><span class="nav-number">2.3.</span> <span class="nav-text">@Documented</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Inherited"><span class="nav-number">2.4.</span> <span class="nav-text">@Inherited</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Repeatable"><span class="nav-number">2.5.</span> <span class="nav-text">@Repeatable</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#注解的属性"><span class="nav-number">3.</span> <span class="nav-text">注解的属性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#注解的本质"><span class="nav-number">3.1.</span> <span class="nav-text">注解的本质</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#注解属性类型"><span class="nav-number">3.2.</span> <span class="nav-text">注解属性类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#注解成员变量赋值"><span class="nav-number">3.3.</span> <span class="nav-text">注解成员变量赋值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#获取注解属性"><span class="nav-number">3.4.</span> <span class="nav-text">获取注解属性</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JDK-提供的注解"><span class="nav-number">4.</span> <span class="nav-text">JDK 提供的注解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#注解作用与应用"><span class="nav-number">5.</span> <span class="nav-text">注解作用与应用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#使用注解进行参数配置"><span class="nav-number">5.1.</span> <span class="nav-text">使用注解进行参数配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第三方框架的应用"><span class="nav-number">5.2.</span> <span class="nav-text">第三方框架的应用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#注解的作用"><span class="nav-number">5.3.</span> <span class="nav-text">注解的作用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#最后说点"><span class="nav-number">6.</span> <span class="nav-text">最后说点</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">maoqitian</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i> 本站访客数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i> 本站总访问量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+  <div class="bg_content">
+  <canvas id="canvas"></canvas>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("VcqMEKTUVGDpIwJn6RGgftJk-gzGzoHsz", "wpViln3oXrO2G2WMVVxfqvuh");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 自定义页面背景动效 -->
+<script type="text/javascript" src="/js/src/dynamic_bg.js"></script>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>

@@ -1,0 +1,1566 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-center-atom.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i["DaoVoiceObject"]=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;a.charset="utf-8";m.parentNode.insertBefore(a,m)})(window,document,"script",('https:' == document.location.protocol ? 'https:' : 'http:') + "//widget.daovoice.io/widget/aa90d435.js","daovoice")
+  daovoice('init', {
+      app_id: "aa90d435"
+    });
+  daovoice('update');
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic|PT Mono:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="MVP,Dagger2,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="maoqitian 个人博客" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="开发一个App，和起房子应该有异曲同工之处，起房子需要画好设计图纸，而我们开发App则需要先设计好App整个架构模式。目前Android一般有MVC、MVP和MVVM，本文则先来说说MVP架构。在了解MVP架构之前，有人可能会说，MVP架构是不是有点落后了，但是我想说，如果你公司有老项目，他就是用MVP架构写的，这时候我们MVP知识是不是就派上用场了；任何架构都有它存在的理由，学习架构的思想才是">
+<meta name="keywords" content="MVP,Dagger2">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android 基本架构之MVP分析与实践">
+<meta property="og:url" content="https://www.maoqitian.com/2019/08/30/AndroidMVP/index.html">
+<meta property="og:site_name" content="maoqitian 个人博客">
+<meta property="og:description" content="开发一个App，和起房子应该有异曲同工之处，起房子需要画好设计图纸，而我们开发App则需要先设计好App整个架构模式。目前Android一般有MVC、MVP和MVVM，本文则先来说说MVP架构。在了解MVP架构之前，有人可能会说，MVP架构是不是有点落后了，但是我想说，如果你公司有老项目，他就是用MVP架构写的，这时候我们MVP知识是不是就派上用场了；任何架构都有它存在的理由，学习架构的思想才是">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/maoqitian/MaoMdPhoto/master/MVP/mvc.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/maoqitian/MaoMdPhoto/master/MVP/MVP1.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/maoqitian/MaoMdPhoto/master/MVP/buildgenerated.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/maoqitian/MaoMdPhoto/master/WanAndroid/MVP-WanAndroid-Architecture1.jpg">
+<meta property="og:updated_time" content="2020-10-15T15:12:51.025Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android 基本架构之MVP分析与实践">
+<meta name="twitter:description" content="开发一个App，和起房子应该有异曲同工之处，起房子需要画好设计图纸，而我们开发App则需要先设计好App整个架构模式。目前Android一般有MVC、MVP和MVVM，本文则先来说说MVP架构。在了解MVP架构之前，有人可能会说，MVP架构是不是有点落后了，但是我想说，如果你公司有老项目，他就是用MVP架构写的，这时候我们MVP知识是不是就派上用场了；任何架构都有它存在的理由，学习架构的思想才是">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/maoqitian/MaoMdPhoto/master/MVP/mvc.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":true},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://www.maoqitian.com/2019/08/30/AndroidMVP/">
+
+
+
+
+
+  <title>Android 基本架构之MVP分析与实践 | maoqitian 个人博客</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+	<!--  -->
+    <a href="https://github.com/maoqitian" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewbox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">maoqitian 个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.maoqitian.com/2019/08/30/AndroidMVP/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="maoqitian">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="maoqitian 个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Android 基本架构之MVP分析与实践</h1>
+        
+
+        <div class="post-meta">
+		   
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-08-30T20:27:22+08:00">
+                2019-08-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android架构/" itemprop="url" rel="index">
+                    <span itemprop="name">Android架构</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2019/08/30/AndroidMVP/" class="leancloud_visitors" data-flag-title="Android 基本架构之MVP分析与实践">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  2.9k字
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  12分钟
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>开发一个App，和起房子应该有异曲同工之处，起房子需要画好设计图纸，而我们开发App则需要先设计好App整个架构模式。目前Android一般有MVC、MVP和MVVM，本文则先来说说MVP架构。在了解MVP架构之前，有人可能会说，MVP架构是不是有点落后了，但是我想说，如果你公司有老项目，他就是用MVP架构写的，这时候我们MVP知识是不是就派上用场了；任何架构都有它存在的理由，学习架构的思想才是关键。MVP分别代表Model、View、Presenter三个英文字母，和传统的MVC 相比，C替换成了P。Presenter英文单词有主持人意思，也就是说Presenter是View 和 Model 的主持人，按照惯例我们先来看两张图。</p>
+</blockquote>
+<h1 id="MVC-MVP-架构对比图"><a href="#MVC-MVP-架构对比图" class="headerlink" title="MVC MVP 架构对比图"></a>MVC MVP 架构对比图</h1><h3 id="mvc"><a href="#mvc" class="headerlink" title="mvc"></a>mvc</h3><p><img src="https://raw.githubusercontent.com/maoqitian/MaoMdPhoto/master/MVP/mvc.jpg" alt="mvc"></p>
+<h3 id="mvp"><a href="#mvp" class="headerlink" title="mvp"></a>mvp</h3><p><img src="https://raw.githubusercontent.com/maoqitian/MaoMdPhoto/master/MVP/MVP1.jpg" alt="mvp"><br><a id="more"></a></p>
+<ul>
+<li>通过以上两张图对比，MVC在Android中就是我们刚开始学习Android时输出Android代码的真实写照，Activity不仅负责显示View，它还是Controller，我们可以在Activity开始网络请求，请求完成更新UI，也可以在Activity中通过UI组件获取用户输入数据，然后执行网络请求再更新UI，这样一来，一个功能复杂的页面一个Activity三四千行代码是很常见的事情，这也会导致后面维护代码人来读你的Activity代码可能会直接崩溃，同时代码的耦合度也很高。</li>
+<li>而我们再看MVP架构，这就会很清晰，它把MVC中的VC进行解耦，也就是说<strong>把Activity中的UI逻辑抽象成View 接口 ,把业务逻辑抽象成 presenter 接口, model 还是原来的model</strong>，这样其实就呼应了文章我们所说presenter主持人的意思，model 更新UI需要通过presenter，view 更新model数据也需要通过presenter，相当于presenter主持大局。</li>
+<li>说了这么多，其实MVC和MVP的区别可以用一句话代替，那就是View能否直接操作Model，接下来我们就看看MVP架构如何在Android中实践。</li>
+</ul>
+<h1 id="Android-实现-mvp-架构"><a href="#Android-实现-mvp-架构" class="headerlink" title="Android 实现 mvp 架构"></a>Android 实现 mvp 架构</h1><h2 id="UI逻辑抽象成View接口"><a href="#UI逻辑抽象成View接口" class="headerlink" title="UI逻辑抽象成View接口"></a>UI逻辑抽象成View接口</h2><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @author maoqitian</span></span><br><span class="line"><span class="comment"> * @Description View 的基类</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title">BaseView</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 正常显示</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">showNormal</span>(<span class="params"></span>)</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 显示错误</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">showError</span>(<span class="params"></span>)</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 正在加载</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">showLoading</span>(<span class="params"></span>)</span>;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 显示错误信息</span></span><br><span class="line"><span class="comment">     * @param errorMsg 错误信息</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">showErrorMsg</span>(<span class="params">String errorMsg</span>)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="业务逻辑抽象成-Presenter-接口"><a href="#业务逻辑抽象成-Presenter-接口" class="headerlink" title="业务逻辑抽象成 Presenter 接口"></a>业务逻辑抽象成 Presenter 接口</h2><ul>
+<li>抽象之前我们可以想一想，每个presenter都对应一个View 界面，所以我们需要一个方法来绑定对应的View，绑定的目的是为了方便我们在presenter中更新view，当界面销毁的时候也需要一个方法类解绑View。此外，界面肯定不止一个，并且肯定实现前面我们写的BaseView接口，我们用泛型代替，就有了如下BasePresenter 接口</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> maoqitian</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@Description</span> Presenter 基类接口</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">AbstractBasePresenter</span>&lt;<span class="title">T</span> <span class="keyword">extends</span> <span class="title">BaseView</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 绑定View</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> view</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">attachView</span><span class="params">(T view)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 解绑View</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">detachView</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="MVP工作流"><a href="#MVP工作流" class="headerlink" title="MVP工作流"></a>MVP工作流</h1><ul>
+<li>前面我们已经抽象出了View、Presenter接口，接下来从结合文章开头MVP  architectural pattern图从用户打开App获取数据开始展现整体MVP工作流。</li>
+</ul>
+<h2 id="View-与-Presenter-结合"><a href="#View-与-Presenter-结合" class="headerlink" title="View 与 Presenter 结合"></a>View 与 Presenter 结合</h2><h3 id="View-获取Presenter对象"><a href="#View-获取Presenter对象" class="headerlink" title="View 获取Presenter对象"></a>View 获取Presenter对象</h3><ul>
+<li>View 获取数据需要通过Presenter对象，view在Android 中一般代表Avtivity、或者Fragment。先创建Avtivity和Fragment抽象类类做基础封装。</li>
+</ul>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @author maoqitian</span></span><br><span class="line"><span class="comment"> * @Description activity基类</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">public <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">AbstractActivity</span> <span class="keyword">extends</span> <span class="title">AppCompatActivity</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">protected</span> void onCreate(<span class="meta">@Nullable</span> <span class="type">Bundle</span> savedInstanceState) &#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line">        setContentView(getLayout());</span><br><span class="line">        onViewCreated();</span><br><span class="line">        initToolbar();</span><br><span class="line">        initEventAndData();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * view 的创建 留给子类实现</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">abstract</span> void onViewCreated();</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 初始化 toolbar</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">abstract</span> void initToolbar();</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 初始化数据留给子类实现</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">abstract</span> void initEventAndData();</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 获取布局对象 留给子类实现</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">abstract</span> int getLayout();</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>接着我们实现MVP Activity基类</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> maoqitian</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@Description</span> MVP BaseActivity 基类</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span>  <span class="title">BaseActivity</span> &lt;<span class="title">T</span> <span class="keyword">extends</span> <span class="title">AbstractBasePresenter</span>&gt; <span class="keyword">extends</span> <span class="title">AbstractActivity</span> <span class="keyword">implements</span> <span class="title">BaseView</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">protected</span> T mPresenter;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(@Nullable Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">        mPresenter = createPresenter();</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line">        </span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onViewCreated</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (mPresenter != <span class="keyword">null</span>) &#123;</span><br><span class="line">            mPresenter.attachView(<span class="keyword">this</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onDestroy</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onDestroy();</span><br><span class="line">        <span class="keyword">if</span>(mPresenter != <span class="keyword">null</span>)&#123;</span><br><span class="line">            mPresenter.detachView();</span><br><span class="line">            mPresenter = <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 创建Presenter</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">abstract</span> T <span class="title">createPresenter</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">showNormal</span><span class="params">()</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">showError</span><span class="params">()</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">showLoading</span><span class="params">()</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">showErrorMsg</span><span class="params">(String errorMsg)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>到此，只要我们界面继承BaseActivity，并且实现createPresenter方法，我们就可以很直接在View中通过Presenter来获获取数据，如何获取呢？接着往下看。</li>
+</ul>
+<h3 id="Presenter-获取View-对象"><a href="#Presenter-获取View-对象" class="headerlink" title="Presenter 获取View 对象"></a>Presenter 获取View 对象</h3><ul>
+<li>现在我们创建一个Presenter基类将其与View结合，为后续步骤做准备，注意我们RxBasePresenter基类构造方法中需要传入DataClient，该类其实就可以概括代表Module。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> maoqitian</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@Description</span> 基于Presenter封装 </span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RxBasePresenter</span>&lt;<span class="title">T</span> <span class="keyword">extends</span> <span class="title">BaseView</span>&gt; <span class="keyword">implements</span> <span class="title">AbstractBasePresenter</span>&lt;<span class="title">T</span>&gt;</span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">protected</span> T mView;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> DataClient mDataClient;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">RxBasePresenter</span><span class="params">(DataClient dataClient)</span></span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.mDataClient=dataClient;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">attachView</span><span class="params">(T view)</span> </span>&#123;</span><br><span class="line">       <span class="keyword">this</span>.mView=view;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">detachView</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.mView = <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Presenter-与-View-之间连接"><a href="#Presenter-与-View-之间连接" class="headerlink" title="Presenter 与 View 之间连接"></a>Presenter 与 View 之间连接</h3><ul>
+<li>当我们创建View 对应Presenter让其继承 RxBasePresenter，则 Presenter便可以执行Updates view，如何操作呢？我们可以通过接口来进行数据获取与显示的扩展。以下举个例子</li>
+</ul>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">public<span class="built_in"> interface </span>MainContract &#123;</span><br><span class="line"></span><br><span class="line">   <span class="built_in"> interface </span>MainView extends BaseView&#123;</span><br><span class="line">        void showMainData();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">   <span class="built_in"> interface </span>MainActivityPresenter extends AbstractBasePresenter&lt;MainView&gt;&#123;</span><br><span class="line">        void getMainData();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>至此，我们基本MVP架构其实就已经搭建完成，我们来看看使用</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> maoqitian</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@Description</span> MainPresenter （Presenter）</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MainPresenter</span> <span class="keyword">extends</span> <span class="title">RxBasePresenter</span>&lt;<span class="title">MainContract</span>.<span class="title">MainView</span>&gt; <span class="keyword">implements</span> <span class="title">MainContract</span>.<span class="title">MainActivityPresenter</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//（Model）</span></span><br><span class="line">    <span class="keyword">private</span> DataClient mDataClient;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MainPresenter</span><span class="params">(DataClient dataClient)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(dataClient);</span><br><span class="line">        <span class="keyword">this</span>.mDataClient = dataClient;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">attachView</span><span class="params">(MainContract.MainView view)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.attachView(view);</span><br><span class="line">        </span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//获取数据</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">getMainData</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">//mDataClient 网络请求获取数据</span></span><br><span class="line">        .......</span><br><span class="line">        <span class="comment">// 数据获取成功展示数据</span></span><br><span class="line">        mView.showMainData();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> maoqitian</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@Description</span> MainActivity （View）</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MainActivity</span> <span class="keyword">extends</span> <span class="title">BaseActivity</span>&lt;<span class="title">MainPresenter</span>&gt;<span class="keyword">implements</span> <span class="title">MainContract</span>.<span class="title">MainView</span></span>&#123;</span><br><span class="line">    ..........</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> MainPresenter <span class="title">createPresenter</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> MainPresenter(<span class="keyword">new</span> DataClient());</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">initEventAndData</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        mPresenter.getMainData();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">showMainData</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">//显示数据</span></span><br><span class="line">    &#125;   </span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>通过以上示例代码，再次对比文章开头的Android MVP  architectural pattern图，从用户打开App获取数据开始展现整体MVP工作流已经走完。</li>
+</ul>
+<h3 id="谷歌官方示例MVP-demo"><a href="#谷歌官方示例MVP-demo" class="headerlink" title="谷歌官方示例MVP demo"></a>谷歌官方示例MVP demo</h3><ul>
+<li>当然上面只是简单的讲解了在Android中搭建基本MVP架构，其实谷歌官方也给我提供了MVP示例代码，具体代码可以自行去了解。</li>
+<li><a href="https://github.com/googlesamples/android-architecture/tree/todo-mvp/" target="_blank" rel="noopener">谷歌官方MVP示例Demo</a></li>
+</ul>
+<h1 id="使用dagger2优化MVP-架构"><a href="#使用dagger2优化MVP-架构" class="headerlink" title="使用dagger2优化MVP 架构"></a>使用dagger2优化MVP 架构</h1><ul>
+<li>前面我们大致搭建了一个基础的MVP架构，每个Presnter需要我们在View 中去创建，创建Presnter的时候还需要传入Model，这就说明他们之间的解耦还不够。这里我们换一种思路，在原有基础，不管是DataClient（Model）还是对应的Presnter都可以直接提供对应的对象，然后对应的类创建我们就将其注入，这样不就省去了对象创建，Model、Presnter、View 之间耦合度就进一步降低，如何实现？还是强大的谷歌爸爸给我们提供了方案，使用<a href="https://github.com/google/dagger" target="_blank" rel="noopener"><strong>Dagger2</strong></a>(Dagger是一个完全静态的编译时依赖注入框架，适用于Java和Android)。</li>
+</ul>
+<h2 id="项目添加对应dagger依赖"><a href="#项目添加对应dagger依赖" class="headerlink" title="项目添加对应dagger依赖"></a>项目添加对应dagger依赖</h2><ul>
+<li>使用dagger对应版本为2.22.1<figure class="highlight clean"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">dependencies &#123;</span><br><span class="line">  <span class="keyword">implementation</span> <span class="string">'com.google.dagger:dagger:2.22.1'</span></span><br><span class="line">  annotationProcessor <span class="string">'com.google.dagger:dagger-compiler:2.22.1'</span></span><br><span class="line">  <span class="comment">//</span></span><br><span class="line">  <span class="keyword">implementation</span> <span class="string">'com.google.dagger:dagger-android:2.22.1'</span></span><br><span class="line">  <span class="keyword">implementation</span> <span class="string">'com.google.dagger:dagger-android-support:2.22.1'</span></span><br><span class="line">  annotationProcessor <span class="string">'com.google.dagger:dagger-android-processor:2.22.1'</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="改造Presnter类"><a href="#改造Presnter类" class="headerlink" title="改造Presnter类"></a>改造Presnter类</h2><ul>
+<li>这里我们以上面例子中MainPresenter为例，在其构造方法添加@Inject注解，表明Dagger2 可以从这获取对应MainPresenter实例，注意构造方法中需要DataClient对象，这里也使用Dagger来提供对象（稍后再说）<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">public <span class="class"><span class="keyword">class</span> <span class="title">MainPresenter</span> <span class="keyword">extends</span> <span class="title">RxBasePresenter&lt;MainContract</span>.<span class="title">MainView&gt;</span> <span class="title">implements</span> <span class="title">MainContract</span>.<span class="title">MainActivityPresenter</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="type">DataClient</span> mDataClient;</span><br><span class="line">    <span class="comment">//@Inject注解表示Dagger2 可以从这获取Presenter 实例</span></span><br><span class="line">    <span class="meta">@Inject</span> </span><br><span class="line">    public <span class="type">MainPresenter</span>(<span class="type">DataClient</span> dataClient) &#123;</span><br><span class="line">        <span class="keyword">super</span>(dataClient);</span><br><span class="line">        <span class="keyword">this</span>.mDataClient = dataClient;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="改造View"><a href="#改造View" class="headerlink" title="改造View"></a>改造View</h2><ul>
+<li>View 中结合 Dagger2 本应该继承 DaggerAppCompatActivity，但是我们基类为AbstractActivity，查看DaggerAppCompatActivity源码，直接手动实现DaggerAppCompatActivity中代码。<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @author maoqitian</span></span><br><span class="line"><span class="comment"> * @Description MVP BaseActivity 基类</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">public <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span>  <span class="title">BaseActivity</span> <span class="title">&lt;T</span> <span class="keyword">extends</span> <span class="title">AbstractBasePresenter&gt;</span> <span class="keyword">extends</span> <span class="title">AbstractSimpleActivity</span> <span class="title">implements</span> <span class="title">BaseView</span>, <span class="title">HasFragmentInjector</span>,<span class="title">HasSupportFragmentInjector</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//Presenter 对象注入 (注意不能使用 private )</span></span><br><span class="line">    <span class="meta">@Inject</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="type">T</span> mPresenter;</span><br><span class="line">    <span class="comment">//手动实现DaggerAppCompatActivity功能</span></span><br><span class="line">    <span class="meta">@Inject</span> <span class="type">DispatchingAndroidInjector</span>&lt;<span class="type">Fragment</span>&gt; supportFragmentInjector;</span><br><span class="line">    <span class="meta">@Inject</span> <span class="type">DispatchingAndroidInjector</span>&lt;android.app.<span class="type">Fragment</span>&gt; frameworkFragmentInjector;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">protected</span> void onCreate(<span class="meta">@Nullable</span> <span class="type">Bundle</span> savedInstanceState) &#123;</span><br><span class="line">        <span class="comment">//必须在super.onCreate之前调用AndroidInjection.inject</span></span><br><span class="line">        <span class="type">AndroidInjection</span>.inject(<span class="keyword">this</span>);</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line">    &#125;</span><br><span class="line">     <span class="meta">@Override</span></span><br><span class="line">    public <span class="type">AndroidInjector</span>&lt;<span class="type">Fragment</span>&gt; supportFragmentInjector() &#123;</span><br><span class="line">        <span class="keyword">return</span> supportFragmentInjector;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    public <span class="type">AndroidInjector</span>&lt;android.app.<span class="type">Fragment</span>&gt; fragmentInjector() &#123;</span><br><span class="line">        <span class="keyword">return</span> frameworkFragmentInjector;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="添加Dagger-Module和Component"><a href="#添加Dagger-Module和Component" class="headerlink" title="添加Dagger Module和Component"></a>添加Dagger Module和Component</h2><h3 id="创建MainActivityModule"><a href="#创建MainActivityModule" class="headerlink" title="创建MainActivityModule"></a>创建MainActivityModule</h3><ul>
+<li>抽象类MainActivityModule加入@Module注解，并添加返回我们对应MainActivityPresenter接口的抽象方法，@Binds注解就可以帮我们把MainActivityPresenter接口绑定到MainPresenter上。<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @author maoqitian</span></span><br><span class="line"><span class="comment"> * @Description MainActivity 可以提供的注入对象Module</span></span><br><span class="line"><span class="comment"> * @Time 2019/3/27 0027 23:59</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="variable">@Module</span></span><br><span class="line">public abstract class MainActivityModule &#123;</span><br><span class="line">    <span class="variable">@ActivityScope</span></span><br><span class="line">    <span class="variable">@Binds</span></span><br><span class="line">    abstract MainContract.MainActivityPresenter bindPresenter(MainPresenter presenter);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="创建用于生成Activity注入器的Module类"><a href="#创建用于生成Activity注入器的Module类" class="headerlink" title="创建用于生成Activity注入器的Module类"></a>创建用于生成Activity注入器的Module类</h3><figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @author maoqitian</span></span><br><span class="line"><span class="comment"> * @Description 用于生成Activity注入器的Module，使用@ContributesAndroidInjector注解并指定modules为</span></span><br><span class="line"><span class="comment"> * @Time 2019/4/14 0014 14:09</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="variable">@Module</span></span><br><span class="line">public abstract class ActivityBindingModule &#123;</span><br><span class="line">   </span><br><span class="line">    <span class="variable">@ActivityScope</span></span><br><span class="line">    <span class="variable">@ContributesAndroidInjector</span>(modules = MainActivityModule.class)</span><br><span class="line">    abstract MainActivity contributeMainActivity();</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="创建提供我们需要对象的Module类"><a href="#创建提供我们需要对象的Module类" class="headerlink" title="创建提供我们需要对象的Module类"></a>创建提供我们需要对象的Module类</h3><ul>
+<li>与前文对应，这里我们提供了对应了DataClient对象，也就是MVP中的Model，在注入Presenter的时候将其一起注入。<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">@Module</span></span><br><span class="line">public class MyAppModule &#123;</span><br><span class="line"></span><br><span class="line">    <span class="variable">@Provides</span></span><br><span class="line">    <span class="variable">@Singleton</span></span><br><span class="line">    public DataClient providerDataClient()&#123;</span><br><span class="line">        <span class="selector-tag">return</span> <span class="selector-tag">new</span> <span class="selector-tag">DataClient</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="使用-Component注解创建AppCompontent接口类"><a href="#使用-Component注解创建AppCompontent接口类" class="headerlink" title="使用@Component注解创建AppCompontent接口类"></a>使用@Component注解创建AppCompontent接口类</h3><ul>
+<li>Dagger会帮我们自动生成DaggerAppComponent类，继承自AndroidInjector并指定我们自己的Application类，指定AndroidSupportInjectionModule帮助把Android中四大组件以及Fragment进行绑定，@Singleton注解指定单例<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">@Singleton</span></span><br><span class="line"><span class="variable">@Component</span>(modules = &#123;</span><br><span class="line">        MyAppModule.class,</span><br><span class="line">        ActivityBindingModule.class,</span><br><span class="line">        AndroidSupportInjectionModule.class</span><br><span class="line">&#125;)</span><br><span class="line">public interface AppComponent extends AndroidInjector&lt;MyApplication&gt; &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="改造Application类继承自DaggerApplication"><a href="#改造Application类继承自DaggerApplication" class="headerlink" title="改造Application类继承自DaggerApplication"></a>改造Application类继承自DaggerApplication</h3><ul>
+<li><p>按照如下改造MyApplication之后我们从新编译编译一下代码，如果编译通过，dagger就会帮我们生成对应DaggerAppComponent.create()方法，将其返回在applicationInjector()方法中。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">public <span class="class"><span class="keyword">class</span> <span class="title">MyApplication</span> <span class="keyword">extends</span> <span class="title">DaggerApplication</span> </span>&#123;</span><br><span class="line">     <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="type">AndroidInjector</span>&lt;? <span class="keyword">extends</span> <span class="type">DaggerApplication</span>&gt; applicationInjector() &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="type">DaggerAppComponent</span>.create();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>项目编译通过dagger会在build目录生成对应对象注入类，具体源码以后再出文章分析，这里就先告一段落了。到此，使用dagger2优化MVP 架构基本完成了，但是还有其他细节这里没有提及，比如每个Presenter之间该如何通信，可以使用EventBus，也可以Rxbus等等，具体细节可以看接下架构实践中我写的开源项目的代码。</p>
+</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/maoqitian/MaoMdPhoto/master/MVP/buildgenerated.png" height="400" width="350"></p>
+<h1 id="架构实践"><a href="#架构实践" class="headerlink" title="架构实践"></a>架构实践</h1><h2 id="项目介绍"><a href="#项目介绍" class="headerlink" title="项目介绍"></a>项目介绍</h2><ul>
+<li>通过前面对MVP架构分析介绍，接下来我给大家推荐我的一个开源项目，<strong>这是一款有较好用户体验的开源玩Android客户端。提供丰富完整的功能，更好的体验，旨在更好的浏览<a href="https://www.wanandroid.com/网站内容，更好的在手机上进行学习。项目使用Retrofit2" target="_blank" rel="noopener">https://www.wanandroid.com/网站内容，更好的在手机上进行学习。项目使用Retrofit2</a> + RxJava2 + Dagger2 +MVP+RxBus架构，尽量使用Material Design控件进行开发。</strong></li>
+</ul>
+<h2 id="项目架构图"><a href="#项目架构图" class="headerlink" title="项目架构图"></a>项目架构图</h2><p><img src="https://raw.githubusercontent.com/maoqitian/MaoMdPhoto/master/WanAndroid/MVP-WanAndroid-Architecture1.jpg" alt="MVP-WanAndroid-Architecture"></p>
+<h2 id="项目地址"><a href="#项目地址" class="headerlink" title="项目地址"></a>项目地址</h2><blockquote>
+<p><a href="https://github.com/maoqitian/MaoWanAndoidClient" target="_blank" rel="noopener">https://github.com/maoqitian/MaoWanAndoidClient</a></p>
+</blockquote>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ul>
+<li>以前所说的知识一种MVP架构的写法，我们也可以根据自己理解写出不一样的MVP，其实MVP架构看似不错，但也还是会有缺点，那就是写一个页面会产生很多个类，虽然结构清晰，但是要写的代码变多了，凡事都会有利弊。如果你不想自己写这么多的类，github上也有大神写好了轮子(<a href="https://github.com/JessYanCoding/MVPArms" target="_blank" rel="noopener">MVPArms</a>)专门帮我们生成MVP架构的框架，但是用框架生成代码总归是别人的，只有自己撸一遍，把逻辑流程梳理清楚才会变成自己的东西，才会成长。文章中如果有错误，请大家给我提出来，大家一起学习进步，如果觉得我的文章给予你帮助，也请给我一个喜欢和关注，同时也欢迎访问我的<a href="https://www.maoqitian.com"><strong>个人博客</strong></a>。</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+ <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-heart"></i>感谢阅读-------------</div>
+    
+</div>
+
+    
+ </div>	
+
+    
+
+    
+
+    
+      <div>
+        <script src="https://cdn.bootcss.com/jquery/2.0.0/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<ul class="post-copyright">
+  <li class="post-copyright-title">
+    <strong>本文标题：</strong>
+    Android 基本架构之MVP分析与实践
+  </li>
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    maoqitian
+  </li>
+  <li class="post-copyright-created_at">
+    <strong>发布时间：</strong>
+    2019-08-30
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://www.maoqitian.com/2019/08/30/AndroidMVP/" title="Android 基本架构之MVP分析与实践">https://www.maoqitian.com/2019/08/30/AndroidMVP/</a>
+	<span class="copy-path" title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="https://www.maoqitian.com/2019/08/30/AndroidMVP/" aria-label="复制成功！"></i></span>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.zh" rel="external nofollow" target="_blank">CC BY-NC-ND 4.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+<script> 
+    var clipboard = new Clipboard('.fa-clipboard');
+    $(".fa-clipboard").click(function(){
+      clipboard.on('success', function(){
+        swal({
+          title: "",
+          text: '复制文章链接成功',
+          icon: "success",
+          showConfirmButton: true
+          });
+	    });
+    });  
+</script>
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/MVP/" rel="tag"><i class="fa fa-tag"></i> MVP</a>
+          
+            <a href="/tags/Dagger2/" rel="tag"><i class="fa fa-tag"></i> Dagger2</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/08/27/WanAndroid/" rel="next" title="撸一个既能学习Android知识又能提升技术的App">
+                <i class="fa fa-chevron-left"></i> 撸一个既能学习Android知识又能提升技术的App
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/09/03/开源库上传-jcenter/" rel="prev" title="开源库上传 jcenter">
+                开源库上传 jcenter <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "1",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      },
+      "slide": {
+        "bdImg": "5",
+        "bdPos": "left",
+        "bdTop": "100"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC80MjU2MS8xOTEwOA=="></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+      <div id="sidebar-dimmer"></div>
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="maoqitian">
+            
+              <p class="site-author-name" itemprop="name">maoqitian</p>
+              <p class="site-description motion-element" itemprop="description">“life was like a box a chocolates, never know what you're gonna get.”</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">69</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/maoqitian" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://juejin.im/user/59e956626fb9a045204b57d4" target="_blank" title="掘金">
+                      
+                        <i class="fa fa-fw fa-drupal"></i>掘金</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.jianshu.com/u/f58cd7ff1a08" target="_blank" title="简书">
+                      
+                        <i class="fa fa-fw fa-book"></i>简书</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:maoqitian068@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-pagelines"></i>
+                友情链接
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://www.wanandroid.com/" title="玩Android" target="_blank">玩Android</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://kymjs.com" title="开源实验室" target="_blank">开源实验室</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://liuwangshu.cn/" title="刘望舒的博客" target="_blank">刘望舒的博客</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#MVC-MVP-架构对比图"><span class="nav-number">1.</span> <span class="nav-text">MVC MVP 架构对比图</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#mvc"><span class="nav-number">1.0.1.</span> <span class="nav-text">mvc</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mvp"><span class="nav-number">1.0.2.</span> <span class="nav-text">mvp</span></a></li></ol></li></ol><li class="nav-item nav-level-1"><a class="nav-link" href="#Android-实现-mvp-架构"><span class="nav-number">2.</span> <span class="nav-text">Android 实现 mvp 架构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#UI逻辑抽象成View接口"><span class="nav-number">2.1.</span> <span class="nav-text">UI逻辑抽象成View接口</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#业务逻辑抽象成-Presenter-接口"><span class="nav-number">2.2.</span> <span class="nav-text">业务逻辑抽象成 Presenter 接口</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#MVP工作流"><span class="nav-number">3.</span> <span class="nav-text">MVP工作流</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#View-与-Presenter-结合"><span class="nav-number">3.1.</span> <span class="nav-text">View 与 Presenter 结合</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#View-获取Presenter对象"><span class="nav-number">3.1.1.</span> <span class="nav-text">View 获取Presenter对象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Presenter-获取View-对象"><span class="nav-number">3.1.2.</span> <span class="nav-text">Presenter 获取View 对象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Presenter-与-View-之间连接"><span class="nav-number">3.1.3.</span> <span class="nav-text">Presenter 与 View 之间连接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#谷歌官方示例MVP-demo"><span class="nav-number">3.1.4.</span> <span class="nav-text">谷歌官方示例MVP demo</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用dagger2优化MVP-架构"><span class="nav-number">4.</span> <span class="nav-text">使用dagger2优化MVP 架构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#项目添加对应dagger依赖"><span class="nav-number">4.1.</span> <span class="nav-text">项目添加对应dagger依赖</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#改造Presnter类"><span class="nav-number">4.2.</span> <span class="nav-text">改造Presnter类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#改造View"><span class="nav-number">4.3.</span> <span class="nav-text">改造View</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#添加Dagger-Module和Component"><span class="nav-number">4.4.</span> <span class="nav-text">添加Dagger Module和Component</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建MainActivityModule"><span class="nav-number">4.4.1.</span> <span class="nav-text">创建MainActivityModule</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建用于生成Activity注入器的Module类"><span class="nav-number">4.4.2.</span> <span class="nav-text">创建用于生成Activity注入器的Module类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建提供我们需要对象的Module类"><span class="nav-number">4.4.3.</span> <span class="nav-text">创建提供我们需要对象的Module类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用-Component注解创建AppCompontent接口类"><span class="nav-number">4.4.4.</span> <span class="nav-text">使用@Component注解创建AppCompontent接口类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#改造Application类继承自DaggerApplication"><span class="nav-number">4.4.5.</span> <span class="nav-text">改造Application类继承自DaggerApplication</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#架构实践"><span class="nav-number">5.</span> <span class="nav-text">架构实践</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#项目介绍"><span class="nav-number">5.1.</span> <span class="nav-text">项目介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#项目架构图"><span class="nav-number">5.2.</span> <span class="nav-text">项目架构图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#项目地址"><span class="nav-number">5.3.</span> <span class="nav-text">项目地址</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">6.</span> <span class="nav-text">总结</span></a></li></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">maoqitian</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i> 本站访客数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i> 本站总访问量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+  <div class="bg_content">
+  <canvas id="canvas"></canvas>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("VcqMEKTUVGDpIwJn6RGgftJk-gzGzoHsz", "wpViln3oXrO2G2WMVVxfqvuh");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 自定义页面背景动效 -->
+<script type="text/javascript" src="/js/src/dynamic_bg.js"></script>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>

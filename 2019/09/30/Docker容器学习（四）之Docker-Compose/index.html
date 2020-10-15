@@ -1,0 +1,1607 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-center-atom.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i["DaoVoiceObject"]=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;a.charset="utf-8";m.parentNode.insertBefore(a,m)})(window,document,"script",('https:' == document.location.protocol ? 'https:' : 'http:') + "//widget.daovoice.io/widget/aa90d435.js","daovoice")
+  daovoice('init', {
+      app_id: "aa90d435"
+    });
+  daovoice('update');
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic|PT Mono:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="docker,Maven,Git,CentOs,docker-compose,wait-for-it,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="maoqitian 个人博客" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="之前的文章中，我们使用docker run 命令来启动一个容器，而作为真正的线上业务环境，我们服务肯定不止一个，也就说明容器肯定不止一个，而如果还是手动的一个个来启动容器这未免会让人头皮发麻，幸好有Docker Compose，用于定义和运行多容器Docker应用程序的工具，有了它我们可以一次启动多个容器，这也非常适合与持续集成工具（Jenkins）来配合。">
+<meta name="keywords" content="docker,Maven,Git,CentOs,docker-compose,wait-for-it">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Docker容器学习（四）之Docker Compose">
+<meta property="og:url" content="https://www.maoqitian.com/2019/09/30/Docker容器学习（四）之Docker-Compose/index.html">
+<meta property="og:site_name" content="maoqitian 个人博客">
+<meta property="og:description" content="之前的文章中，我们使用docker run 命令来启动一个容器，而作为真正的线上业务环境，我们服务肯定不止一个，也就说明容器肯定不止一个，而如果还是手动的一个个来启动容器这未免会让人头皮发麻，幸好有Docker Compose，用于定义和运行多容器Docker应用程序的工具，有了它我们可以一次启动多个容器，这也非常适合与持续集成工具（Jenkins）来配合。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/maoqitian/MaoMdPhoto/master/Docker/dockerlogo.jpg">
+<meta property="og:image" content="https://github.com/maoqitian/MaoMdPhoto/raw/master/Docker/Docker%20Compose%E7%89%88%E6%9C%AC%E5%AF%B9%E5%BA%94.png">
+<meta property="og:image" content="https://github.com/maoqitian/MaoMdPhoto/raw/master/Docker/docker-compose.yml%E5%90%AF%E5%8A%A8%E5%AF%B9%E5%BA%94%E7%9A%84%E6%9C%8D%E5%8A%A1.png">
+<meta property="og:image" content="https://github.com/maoqitian/MaoMdPhoto/raw/master/Docker/%E5%90%8E%E5%8F%B0%E6%9C%89%E9%A1%BA%E5%BA%8F%E5%90%AF%E5%8A%A8%E6%9C%8D%E5%8A%A1%E6%88%90%E5%8A%9F.png">
+<meta property="og:updated_time" content="2020-10-15T14:26:43.684Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Docker容器学习（四）之Docker Compose">
+<meta name="twitter:description" content="之前的文章中，我们使用docker run 命令来启动一个容器，而作为真正的线上业务环境，我们服务肯定不止一个，也就说明容器肯定不止一个，而如果还是手动的一个个来启动容器这未免会让人头皮发麻，幸好有Docker Compose，用于定义和运行多容器Docker应用程序的工具，有了它我们可以一次启动多个容器，这也非常适合与持续集成工具（Jenkins）来配合。">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/maoqitian/MaoMdPhoto/master/Docker/dockerlogo.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":true},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://www.maoqitian.com/2019/09/30/Docker容器学习（四）之Docker-Compose/">
+
+
+
+
+
+  <title>Docker容器学习（四）之Docker Compose | maoqitian 个人博客</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+	<!--  -->
+    <a href="https://github.com/maoqitian" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewbox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">maoqitian 个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.maoqitian.com/2019/09/30/Docker容器学习（四）之Docker-Compose/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="maoqitian">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="maoqitian 个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Docker容器学习（四）之Docker Compose</h1>
+        
+
+        <div class="post-meta">
+		   
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-09-30T15:26:49+08:00">
+                2019-09-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/Docker/" itemprop="url" rel="index">
+                    <span itemprop="name">Docker</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2019/09/30/Docker容器学习（四）之Docker-Compose/" class="leancloud_visitors" data-flag-title="Docker容器学习（四）之Docker Compose">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  1.7k字
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  7分钟
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="https://raw.githubusercontent.com/maoqitian/MaoMdPhoto/master/Docker/dockerlogo.jpg" alt="dockerlogo"></p>
+<blockquote>
+<p>之前的文章中，我们使用docker run 命令来启动一个容器，而作为真正的线上业务环境，我们服务肯定不止一个，也就说明容器肯定不止一个，而如果还是手动的一个个来启动容器这未免会让人头皮发麻，幸好有<strong>Docker Compose</strong>，用于定义和运行多容器Docker应用程序的工具，有了它我们可以一次启动多个容器，这也非常适合与持续集成工具（Jenkins）来配合。<br><a id="more"></a></p>
+</blockquote>
+<h3 id="安装-Docker-Compose"><a href="#安装-Docker-Compose" class="headerlink" title="安装 Docker Compose"></a>安装 Docker Compose</h3><ul>
+<li>根据<a href="https://docs.docker.com/compose/install/" target="_blank" rel="noopener">官方</a>安装最新版本</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo curl -L <span class="string">"https://github.com/docker/compose/releases/download/1.24.0/docker-compose-<span class="variable">$(uname -s)</span>-<span class="variable">$(uname -m)</span>"</span> -o /usr/<span class="built_in">local</span>/bin/docker-compose</span><br></pre></td></tr></table></figure>
+<ul>
+<li>安装脚本添加执行权限</li>
+</ul>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chmod +x <span class="regexp">/usr/</span>local<span class="regexp">/bin/</span>docker-compose</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>注意：</strong> 根据前面的步骤理论上是安装完成了，但是我们执行官方命令只是下载到了/usr/local/bin/这个目录，添加脚本执行权限之后docker-compose并不能生效，依据官方文档提示复制该文件到/usr/bin/目录下，并未该文件添加脚本执行权限</li>
+</ul>
+<figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo ln -s <span class="meta-keyword">/usr/</span>local<span class="meta-keyword">/bin/</span>docker-compose <span class="meta-keyword">/usr/</span>bin/docker-compose</span><br><span class="line"></span><br><span class="line">chmod +x <span class="meta-keyword">/usr/</span>bin/docker-compose</span><br></pre></td></tr></table></figure>
+<ul>
+<li>此时我们执行docker-compose版本命令就能看到版本号打印</li>
+</ul>
+<figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># docker-compose --version</span><br><span class="line">docker-compose version <span class="number">1.24</span><span class="number">.0</span>, build <span class="number">0</span>aa59064</span><br></pre></td></tr></table></figure>
+<ul>
+<li>命令补全工具</li>
+</ul>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo curl -L https:<span class="regexp">//</span>raw.githubusercontent.com<span class="regexp">/docker/</span>compose<span class="regexp">/1.24.0/</span>contrib<span class="regexp">/completion/</span>bash<span class="regexp">/docker-compose -o /</span>etc<span class="regexp">/bash_completion.d/</span>docker-compose</span><br></pre></td></tr></table></figure>
+<ul>
+<li>版本<br><img src="https://github.com/maoqitian/MaoMdPhoto/raw/master/Docker/Docker%20Compose%E7%89%88%E6%9C%AC%E5%AF%B9%E5%BA%94.png" alt="Docker Compose版本对应"></li>
+</ul>
+<h3 id="docker-compose-yml-命令"><a href="#docker-compose-yml-命令" class="headerlink" title="docker-compose.yml 命令"></a>docker-compose.yml 命令</h3><ul>
+<li><a href="https://docs.docker.com/compose/compose-file/" target="_blank" rel="noopener">https://docs.docker.com/compose/compose-file/</a><h3 id="docker-compose-命令"><a href="#docker-compose-命令" class="headerlink" title="docker-compose 命令"></a>docker-compose 命令</h3></li>
+<li>和前面学习Docker容器命令一样，docker-compose也有不少命令</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>含义</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>build</td>
+<td>构建或重新构建服务</td>
+<td>build [options] [–build-arg key=val…] [SERVICE…]（使用 docker-compose help build 查看详细使用）</td>
+</tr>
+<tr>
+<td>help</td>
+<td>查看docker-compose命令帮助文档</td>
+<td>docker-compose help COMMAND（标识要看的命令）</td>
+</tr>
+<tr>
+<td>up</td>
+<td>构建、创建、重新创建、启动，连接服务的相关容器。所有连接的服务都会启动，除非它们已经运行(前提该目录下已经存在docker-compose.yml文件)</td>
+<td>docker-compose up(直接启动，该命令退出，所有容器停止) docker-compose up -d (后台运行所有容器)</td>
+</tr>
+<tr>
+<td>kill</td>
+<td>发送SIGKILL 信号停止指定服务的容器</td>
+<td>docker-compose kill api-feign(注意该名称为docker-compose.yml中定义的服务名称) </td>
+</tr>
+<tr>
+<td>start</td>
+<td>启动指定服务已存在的容器</td>
+<td>docker-compose start api-feign</td>
+</tr>
+<tr>
+<td>stop</td>
+<td>停止指定服务已存在的容器</td>
+<td>docker-compose stop api-feign</td>
+</tr>
+<tr>
+<td>logs</td>
+<td>查看服务的日志输出</td>
+<td>docker-compose logs –tail=”all” api-feign（查看api-feign 全部日志输出）</td>
+</tr>
+<tr>
+<td>ps</td>
+<td>列出所有容器</td>
+<td>docker-compose ps （和docker ps -a 一样可以查看容器，显示信息不一样）</td>
+</tr>
+<tr>
+<td>rm</td>
+<td>删除指定服务的容器</td>
+<td>docker-compose rm api-feign</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>更多docker-compose命令查看<a href="https://docs.docker.com/compose/reference/overview/" target="_blank" rel="noopener">docker-compose官方文档</a></li>
+</ul>
+<h3 id="编写docker-compose-yml-启动多服务"><a href="#编写docker-compose-yml-启动多服务" class="headerlink" title="编写docker-compose.yml 启动多服务"></a>编写docker-compose.yml 启动多服务</h3><ul>
+<li><p>服务器任意目录编写文件 docker-compose.yml</p>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">version</span>: <span class="string">'3.4'</span></span><br><span class="line"><span class="attribute">services</span>:</span><br><span class="line">  <span class="attribute">configerver</span>:  # 指定一个服务名称</span><br><span class="line">    <span class="attribute">image</span>: mao/<span class="attribute">configserver</span>:<span class="number">0.0</span>.<span class="number">1</span>-SNAPSHOT  # 镜像名称</span><br><span class="line">    <span class="attribute">ports</span>:</span><br><span class="line">      - <span class="number">8666</span>:<span class="number">8666</span>  # 指定端口映射</span><br><span class="line">  <span class="attribute">eureka</span>:</span><br><span class="line">    <span class="attribute">image</span>: test1/<span class="attribute">eureka1</span>:<span class="number">0.0</span>.<span class="number">1</span>-SNAPSHOT</span><br><span class="line">    <span class="attribute">ports</span>:</span><br><span class="line">      - <span class="number">8805</span>:<span class="number">8805</span></span><br><span class="line">  <span class="attribute">server-admin</span>:</span><br><span class="line">    <span class="attribute">image</span>: mao/<span class="attribute">server-admin</span>:<span class="number">0.0</span>.<span class="number">1</span>-SNAPSHOT</span><br><span class="line">    <span class="attribute">ports</span>:</span><br><span class="line">      - <span class="number">8806</span>:<span class="number">8806</span></span><br><span class="line">  <span class="attribute">api-feign</span>:</span><br><span class="line">    <span class="attribute">image</span>: mao/<span class="attribute">api-feign</span>:<span class="number">0.0</span>.<span class="number">1</span>-SNAPSHOT</span><br><span class="line">    <span class="attribute">ports</span>:</span><br><span class="line">      - <span class="number">8840</span>:<span class="number">8840</span></span><br><span class="line">  <span class="attribute">ribbon-consumer</span>:</span><br><span class="line">    <span class="attribute">image</span>: mao/<span class="attribute">ribbon-consumer</span>:<span class="number">0.0</span>.<span class="number">1</span>-SNAPSHOT</span><br><span class="line">    <span class="attribute">ports</span>:</span><br><span class="line">      - <span class="number">8830</span>:<span class="number">8830</span></span><br><span class="line">  <span class="attribute">ribbon-provider</span>:</span><br><span class="line">    <span class="attribute">image</span>: mao/<span class="attribute">ribbon-provider</span>:<span class="number">0.0</span>.<span class="number">1</span>-SNAPSHOT</span><br><span class="line">    <span class="attribute">ports</span>:</span><br><span class="line">      - <span class="number">8820</span>:<span class="number">8820</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在docker-compose.yml目录下执行命令启动多个服务(安装好Docker Compose前提下)</p>
+</li>
+</ul>
+<figure class="highlight vala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># docker compose 构建镜像并使用镜像启动容器（-d 表示后台启动）</span></span><br><span class="line">docker-compose up -d</span><br></pre></td></tr></table></figure>
+<p><img src="https://github.com/maoqitian/MaoMdPhoto/raw/master/Docker/docker-compose.yml%E5%90%AF%E5%8A%A8%E5%AF%B9%E5%BA%94%E7%9A%84%E6%9C%8D%E5%8A%A1.png" alt="docker-compose.yml启动对应的服务"></p>
+<ul>
+<li>由上图我们发现各个服务都已经启动在各自的容器当中，但是访问服务的时候只有configserver（配置中心）能够访问，其他服务都不能访问，我们仔细想想就能知道，除了配置中心，其他服务的配置文件都要通过配置中心来获取，但是docker-compose启动是同时的，所以配置中心服务还没提供其他服务就已经启动了，这显然会让其他服务报错，所以在生产环境中我们必须要控制服务的启动顺序，也就是最先启动配置中心，然后启动注册中心，最后再启动其他服务。</li>
+</ul>
+<h3 id="Docker-Compose控制服务启动顺序"><a href="#Docker-Compose控制服务启动顺序" class="headerlink" title="Docker Compose控制服务启动顺序"></a>Docker Compose控制服务启动顺序</h3><ul>
+<li><a href="https://docs.docker.com/compose/startup-order/" target="_blank" rel="noopener">Docker Compose控制服务启动顺序官方文档说明</a>，本文使用<a href="https://github.com/vishnubob/wait-for-it" target="_blank" rel="noopener">wait-for-it</a>方案，除了wait-for-it，还有<a href="https://github.com/jwilder/dockerize" target="_blank" rel="noopener">dockerize</a>和 <a href="https://github.com/Eficode/wait-for" target="_blank" rel="noopener">wait-for</a> 方案。</li>
+<li>wait-for-it是一个bash脚本，执行该脚本将等待主机和TCP端口的可用性。它可用于同步相互依赖的服务的启动，例如链接的docker容器<h3 id="如何使用"><a href="#如何使用" class="headerlink" title="如何使用"></a>如何使用</h3></li>
+<li>接下来我将介绍如何使用该脚本来控制我们服务启动顺序</li>
+<li><p>首先我们可以将脚本打包到我们的镜像中，修改Dockerfile文件</p>
+<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#Dockerfile中 </span></span><br><span class="line">....</span><br><span class="line">COPY <span class="built_in">wait</span>-<span class="keyword">for</span>-<span class="keyword">it</span>.sh /<span class="built_in">wait</span>-<span class="keyword">for</span>-<span class="keyword">it</span>.sh <span class="comment">#在本项目模块根目录下复制wait-for-it.sh 到镜像/目录下</span></span><br><span class="line">RUN chmod +x /<span class="built_in">wait</span>-<span class="keyword">for</span>-<span class="keyword">it</span>.sh <span class="comment"># 修改脚本权限</span></span><br><span class="line">....</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>再次使用docker-maven-plugin打包镜像</p>
+</li>
+<li>重新编写docker-compose.yml文件，添加entrypoint执行我们前面打包如镜像的wait-for-it.sh脚本监控配置中心是否已经提供服务，注意ENTRYPOINT指令是不会被覆盖的，最终会执行监控./wait-for-it.sh configerver:8666配置中心是否提供服务来通过配置中心获取配置来启动其他服务</li>
+</ul>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">version</span>: <span class="string">'3.7'</span></span><br><span class="line"><span class="attribute">services</span>:</span><br><span class="line">  <span class="attribute">configerver</span>:  # 指定一个服务名词</span><br><span class="line">    <span class="attribute">image</span>: mao/<span class="attribute">configserver</span>:<span class="number">0.0</span>.<span class="number">1</span>-SNAPSHOT  # 镜像名称</span><br><span class="line">    <span class="attribute">ports</span>:</span><br><span class="line">      - <span class="number">8666</span>:<span class="number">8666</span>  # 指定端口映射</span><br><span class="line">    <span class="attribute">depends_on</span>:</span><br><span class="line">      - eureka</span><br><span class="line">  <span class="attribute">eureka</span>:</span><br><span class="line">    <span class="attribute">image</span>: mao/<span class="attribute">eureka</span>:<span class="number">0.0</span>.<span class="number">1</span>-SNAPSHOT</span><br><span class="line">    <span class="attribute">ports</span>:</span><br><span class="line">      - <span class="number">8805</span>:<span class="number">8805</span></span><br><span class="line">    <span class="attribute">entrypoint</span>: <span class="string">"./wait-for-it.sh configerver:8666 -- java -jar /app.jar"</span></span><br><span class="line">  <span class="attribute">server-admin</span>:</span><br><span class="line">    <span class="attribute">image</span>: mao/<span class="attribute">server-admin</span>:<span class="number">0.0</span>.<span class="number">1</span>-SNAPSHOT</span><br><span class="line">    <span class="attribute">ports</span>:</span><br><span class="line">      - <span class="number">8806</span>:<span class="number">8806</span></span><br><span class="line">    <span class="attribute">depends_on</span>:</span><br><span class="line">      - eureka</span><br><span class="line">      - configerver</span><br><span class="line">    <span class="attribute">entrypoint</span>: <span class="string">"./wait-for-it.sh configerver:8666 -- java -jar /app.jar"</span></span><br><span class="line">  <span class="attribute">api-feign</span>:</span><br><span class="line">    <span class="attribute">image</span>: mao/<span class="attribute">api-feign</span>:<span class="number">0.0</span>.<span class="number">1</span>-SNAPSHOT</span><br><span class="line">    <span class="attribute">ports</span>:</span><br><span class="line">      - <span class="number">8840</span>:<span class="number">8840</span></span><br><span class="line">    <span class="attribute">depends_on</span>:</span><br><span class="line">      - eureka</span><br><span class="line">      - configerver</span><br><span class="line">    <span class="attribute">entrypoint</span>: <span class="string">"./wait-for-it.sh configerver:8666 -- java -jar /app.jar"</span></span><br><span class="line">  <span class="attribute">ribbon-consumer</span>:</span><br><span class="line">    <span class="attribute">image</span>: mao/<span class="attribute">ribbon-consumer</span>:<span class="number">0.0</span>.<span class="number">1</span>-SNAPSHOT</span><br><span class="line">    <span class="attribute">ports</span>:</span><br><span class="line">      - <span class="number">8830</span>:<span class="number">8830</span></span><br><span class="line">    <span class="attribute">depends_on</span>:</span><br><span class="line">      - eureka</span><br><span class="line">      - configerver</span><br><span class="line">    <span class="attribute">entrypoint</span>: <span class="string">"./wait-for-it.sh configerver:8666 -- java -jar /app.jar"</span></span><br><span class="line">  <span class="attribute">ribbon-provider</span>:</span><br><span class="line">    <span class="attribute">image</span>: mao/<span class="attribute">ribbon-provider</span>:<span class="number">0.0</span>.<span class="number">1</span>-SNAPSHOT</span><br><span class="line">    <span class="attribute">ports</span>:</span><br><span class="line">      - <span class="number">8820</span>:<span class="number">8820</span></span><br><span class="line">    <span class="attribute">depends_on</span>:</span><br><span class="line">      - eureka</span><br><span class="line">      - configerver</span><br><span class="line">    <span class="attribute">entrypoint</span>: <span class="string">"./wait-for-it.sh configerver:8666 -- java -jar /app.jar"</span></span><br><span class="line">  <span class="attribute">gateway</span>:</span><br><span class="line">    <span class="attribute">image</span>: mao/<span class="attribute">gateway</span>:<span class="number">0.0</span>.<span class="number">1</span>-SNAPSHOT</span><br><span class="line">    <span class="attribute">ports</span>:</span><br><span class="line">      - <span class="number">8081</span>:<span class="number">8081</span></span><br><span class="line">    <span class="attribute">depends_on</span>:</span><br><span class="line">      - eureka</span><br><span class="line">      - configerver</span><br><span class="line">    <span class="attribute">entrypoint</span>: <span class="string">"./wait-for-it.sh configerver:8666 -- java -jar /app.jar"</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>然后我们在服务器中执行docker-compose命令后台一键启动服务，不出意外服务就能够全部启动</li>
+</ul>
+<figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">docker-compose up -d</span></span><br></pre></td></tr></table></figure>
+<p><img src="https://github.com/maoqitian/MaoMdPhoto/raw/master/Docker/%E5%90%8E%E5%8F%B0%E6%9C%89%E9%A1%BA%E5%BA%8F%E5%90%AF%E5%8A%A8%E6%9C%8D%E5%8A%A1%E6%88%90%E5%8A%9F.png" alt="后台有顺序启动服务成功"></p>
+<h3 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h3><ul>
+<li>本篇文章我们学习了如何使用Docker Compose来启动多个容器，而多个容器改如何管理呢？谷歌已经给了我们答案，那就是使用k8s，而k8s是什么呢，请看我的这一篇文章<a href="https://juejin.im/post/5d4145696fb9a06b2a201c47" target="_blank" rel="noopener">Kubeadm 部署 Kubernetes 1.14.2 集群</a></li>
+</ul>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><ul>
+<li><a href="https://stackoverflow.com/questions/36685980/docker-is-installed-but-docker-compose-is-not-why/47061271" target="_blank" rel="noopener">Docker is installed but Docker Compose is not ? why?
+</a></li>
+<li><a href="https://github.com/vishnubob/wait-for-it/issues/57" target="_blank" rel="noopener">wait for it Usage with Docker</a></li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+ <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-heart"></i>感谢阅读-------------</div>
+    
+</div>
+
+    
+ </div>	
+
+    
+
+    
+
+    
+      <div>
+        <script src="https://cdn.bootcss.com/jquery/2.0.0/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<ul class="post-copyright">
+  <li class="post-copyright-title">
+    <strong>本文标题：</strong>
+    Docker容器学习（四）之Docker Compose
+  </li>
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    maoqitian
+  </li>
+  <li class="post-copyright-created_at">
+    <strong>发布时间：</strong>
+    2019-09-30
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://www.maoqitian.com/2019/09/30/Docker容器学习（四）之Docker-Compose/" title="Docker容器学习（四）之Docker Compose">https://www.maoqitian.com/2019/09/30/Docker容器学习（四）之Docker-Compose/</a>
+	<span class="copy-path" title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="https://www.maoqitian.com/2019/09/30/Docker容器学习（四）之Docker-Compose/" aria-label="复制成功！"></i></span>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.zh" rel="external nofollow" target="_blank">CC BY-NC-ND 4.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+<script> 
+    var clipboard = new Clipboard('.fa-clipboard');
+    $(".fa-clipboard").click(function(){
+      clipboard.on('success', function(){
+        swal({
+          title: "",
+          text: '复制文章链接成功',
+          icon: "success",
+          showConfirmButton: true
+          });
+	    });
+    });  
+</script>
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/docker/" rel="tag"><i class="fa fa-tag"></i> docker</a>
+          
+            <a href="/tags/Maven/" rel="tag"><i class="fa fa-tag"></i> Maven</a>
+          
+            <a href="/tags/Git/" rel="tag"><i class="fa fa-tag"></i> Git</a>
+          
+            <a href="/tags/CentOs/" rel="tag"><i class="fa fa-tag"></i> CentOs</a>
+          
+            <a href="/tags/docker-compose/" rel="tag"><i class="fa fa-tag"></i> docker-compose</a>
+          
+            <a href="/tags/wait-for-it/" rel="tag"><i class="fa fa-tag"></i> wait-for-it</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/09/22/Docker容器学习（三）之Docker-镜像构建/" rel="next" title="Docker容器学习（三）之Docker 镜像构建">
+                <i class="fa fa-chevron-left"></i> Docker容器学习（三）之Docker 镜像构建
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/12/01/Flutter-与-Dart-语法初探/" rel="prev" title="Flutter 与 Dart 语法初探">
+                Flutter 与 Dart 语法初探 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "1",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      },
+      "slide": {
+        "bdImg": "5",
+        "bdPos": "left",
+        "bdTop": "100"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC80MjU2MS8xOTEwOA=="></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+      <div id="sidebar-dimmer"></div>
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="maoqitian">
+            
+              <p class="site-author-name" itemprop="name">maoqitian</p>
+              <p class="site-description motion-element" itemprop="description">“life was like a box a chocolates, never know what you're gonna get.”</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">69</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/maoqitian" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://juejin.im/user/59e956626fb9a045204b57d4" target="_blank" title="掘金">
+                      
+                        <i class="fa fa-fw fa-drupal"></i>掘金</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.jianshu.com/u/f58cd7ff1a08" target="_blank" title="简书">
+                      
+                        <i class="fa fa-fw fa-book"></i>简书</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:maoqitian068@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-pagelines"></i>
+                友情链接
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://www.wanandroid.com/" title="玩Android" target="_blank">玩Android</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://kymjs.com" title="开源实验室" target="_blank">开源实验室</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://liuwangshu.cn/" title="刘望舒的博客" target="_blank">刘望舒的博客</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装-Docker-Compose"><span class="nav-number">1.</span> <span class="nav-text">安装 Docker Compose</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#docker-compose-yml-命令"><span class="nav-number">2.</span> <span class="nav-text">docker-compose.yml 命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#docker-compose-命令"><span class="nav-number">3.</span> <span class="nav-text">docker-compose 命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编写docker-compose-yml-启动多服务"><span class="nav-number">4.</span> <span class="nav-text">编写docker-compose.yml 启动多服务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Docker-Compose控制服务启动顺序"><span class="nav-number">5.</span> <span class="nav-text">Docker Compose控制服务启动顺序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#如何使用"><span class="nav-number">6.</span> <span class="nav-text">如何使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#最后"><span class="nav-number">7.</span> <span class="nav-text">最后</span></a></li></ol><li class="nav-item nav-level-2"><a class="nav-link" href="#参考链接"><span class="nav-number"></span> <span class="nav-text">参考链接</span></a></li></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">maoqitian</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i> 本站访客数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i> 本站总访问量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+  <div class="bg_content">
+  <canvas id="canvas"></canvas>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("VcqMEKTUVGDpIwJn6RGgftJk-gzGzoHsz", "wpViln3oXrO2G2WMVVxfqvuh");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 自定义页面背景动效 -->
+<script type="text/javascript" src="/js/src/dynamic_bg.js"></script>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>

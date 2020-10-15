@@ -1,0 +1,1535 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-center-atom.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i["DaoVoiceObject"]=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;a.charset="utf-8";m.parentNode.insertBefore(a,m)})(window,document,"script",('https:' == document.location.protocol ? 'https:' : 'http:') + "//widget.daovoice.io/widget/aa90d435.js","daovoice")
+  daovoice('init', {
+      app_id: "aa90d435"
+    });
+  daovoice('update');
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic|PT Mono:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Android,Android运行时权限,permission,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="maoqitian 个人博客" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="从Android M（6.0 API级别23）开始，用户开始在应用运行时向其授予权限，而不是在应用安装时授予。此方法可以简化应用安装过程，因为用户在安装或更新应用时不需要授予权限。">
+<meta name="keywords" content="Android,Android运行时权限,permission">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android运行时权限机制解析">
+<meta property="og:url" content="https://www.maoqitian.com/2019/01/19/Android运行时权限机制解析/index.html">
+<meta property="og:site_name" content="maoqitian 个人博客">
+<meta property="og:description" content="从Android M（6.0 API级别23）开始，用户开始在应用运行时向其授予权限，而不是在应用安装时授予。此方法可以简化应用安装过程，因为用户在安装或更新应用时不需要授予权限。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://github.com/maoqitian/MaoMdPhoto/raw/master/Android%20%E8%BF%90%E8%A1%8C%E6%97%B6%E6%9D%83%E9%99%90/adb%20%E6%9F%A5%E7%9C%8B%E5%8D%B1%E9%99%A9%E6%9D%83%E9%99%90.png">
+<meta property="og:updated_time" content="2020-10-15T14:26:43.683Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android运行时权限机制解析">
+<meta name="twitter:description" content="从Android M（6.0 API级别23）开始，用户开始在应用运行时向其授予权限，而不是在应用安装时授予。此方法可以简化应用安装过程，因为用户在安装或更新应用时不需要授予权限。">
+<meta name="twitter:image" content="https://github.com/maoqitian/MaoMdPhoto/raw/master/Android%20%E8%BF%90%E8%A1%8C%E6%97%B6%E6%9D%83%E9%99%90/adb%20%E6%9F%A5%E7%9C%8B%E5%8D%B1%E9%99%A9%E6%9D%83%E9%99%90.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":true},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://www.maoqitian.com/2019/01/19/Android运行时权限机制解析/">
+
+
+
+
+
+  <title>Android运行时权限机制解析 | maoqitian 个人博客</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+	<!--  -->
+    <a href="https://github.com/maoqitian" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewbox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">maoqitian 个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.maoqitian.com/2019/01/19/Android运行时权限机制解析/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="maoqitian">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="maoqitian 个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Android运行时权限机制解析</h1>
+        
+
+        <div class="post-meta">
+		   
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-19T00:14:42+08:00">
+                2019-01-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android基础回顾/" itemprop="url" rel="index">
+                    <span itemprop="name">Android基础回顾</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2019/01/19/Android运行时权限机制解析/" class="leancloud_visitors" data-flag-title="Android运行时权限机制解析">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  2.7k字
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  12分钟
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>从Android M（6.0 API级别23）开始，用户开始在应用运行时向其授予权限，而不是在应用安装时授予。此方法可以简化应用安装过程，因为用户在安装或更新应用时不需要授予权限。<br><a id="more"></a></p>
+</blockquote>
+<h3 id="权限介绍"><a href="#权限介绍" class="headerlink" title="权限介绍"></a>权限介绍</h3><ul>
+<li>权限机制的目的是保护用户的隐私，Android应用程序必须请求访问敏感用户数据（如联系人和短信）以及某些系统特性（如照相机和互联网）的许可。根据该特征，系统可以自动授予许可，或者提示用户批准请求。</li>
+<li>如果设备运行的是 Android 6.0 或更高版本，或者应用的目标 SDK 为 23 或更高：应用必须在清单文件中中列出权限，并且它必须在运行时请求其需要的每项危险权限。用户可以授予或拒绝每项权限，且即使用户拒绝权限请求，应用仍可以继续运行有限的功能。</li>
+</ul>
+<h3 id="权限类别"><a href="#权限类别" class="headerlink" title="权限类别"></a>权限类别</h3><h4 id="正常权限"><a href="#正常权限" class="headerlink" title="正常权限"></a>正常权限</h4><ul>
+<li>正常权限不会给用户的隐私带来风险，如果你在清单文件（AndroidManifest.xml）中加入了正常权限声明，则安卓系统会自动授予App应用该权限，如下列出了正常权限</li>
+</ul>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">android<span class="selector-class">.permission</span><span class="selector-class">.ACCESS_LOCATION_EXTRA_COMMANDS</span></span><br><span class="line">android<span class="selector-class">.permission</span><span class="selector-class">.ACCESS_NETWORK_STATE</span></span><br><span class="line">android<span class="selector-class">.permission</span><span class="selector-class">.ACCESS_NOTIFICATION_POLICY</span></span><br><span class="line">android<span class="selector-class">.permission</span><span class="selector-class">.ACCESS_WIFI_STATE</span></span><br><span class="line">android<span class="selector-class">.permission</span><span class="selector-class">.ACCESS_WIMAX_STATE</span></span><br><span class="line">android<span class="selector-class">.permission</span><span class="selector-class">.BLUETOOTH</span></span><br><span class="line">android<span class="selector-class">.permission</span><span class="selector-class">.BLUETOOTH_ADMIN</span></span><br><span class="line">android<span class="selector-class">.permission</span><span class="selector-class">.BROADCAST_STICKY</span></span><br><span class="line">android<span class="selector-class">.permission</span><span class="selector-class">.CHANGE_NETWORK_STATE</span></span><br><span class="line">android<span class="selector-class">.permission</span><span class="selector-class">.CHANGE_WIFI_MULTICAST_STATE</span></span><br><span class="line">android<span class="selector-class">.permission</span><span class="selector-class">.CHANGE_WIFI_STATE</span></span><br><span class="line">android<span class="selector-class">.permission</span><span class="selector-class">.CHANGE_WIMAX_STATE</span></span><br><span class="line">android<span class="selector-class">.permission</span><span class="selector-class">.DISABLE_KEYGUARD</span></span><br><span class="line">android<span class="selector-class">.permission</span><span class="selector-class">.EXPAND_STATUS_BAR</span></span><br><span class="line">android<span class="selector-class">.permission</span><span class="selector-class">.FLASHLIGHT</span></span><br><span class="line">android<span class="selector-class">.permission</span><span class="selector-class">.GET_ACCOUNTS</span></span><br><span class="line">android<span class="selector-class">.permission</span><span class="selector-class">.GET_PACKAGE_SIZE</span></span><br><span class="line">android<span class="selector-class">.permission</span><span class="selector-class">.INTERNET</span></span><br><span class="line">android<span class="selector-class">.permission</span><span class="selector-class">.KILL_BACKGROUND_PROCESSES</span></span><br><span class="line">android<span class="selector-class">.permission</span><span class="selector-class">.MODIFY_AUDIO_SETTINGS</span></span><br><span class="line">android<span class="selector-class">.permission</span><span class="selector-class">.NFC</span></span><br><span class="line">android<span class="selector-class">.permission</span><span class="selector-class">.READ_SYNC_SETTINGS</span></span><br><span class="line">android<span class="selector-class">.permission</span><span class="selector-class">.READ_SYNC_STATS</span></span><br><span class="line">android<span class="selector-class">.permission</span><span class="selector-class">.RECEIVE_BOOT_COMPLETED</span></span><br><span class="line">android<span class="selector-class">.permission</span><span class="selector-class">.REORDER_TASKS</span></span><br><span class="line">android<span class="selector-class">.permission</span><span class="selector-class">.REQUEST_INSTALL_PACKAGES</span></span><br><span class="line">android<span class="selector-class">.permission</span><span class="selector-class">.SET_TIME_ZONE</span></span><br><span class="line">android<span class="selector-class">.permission</span><span class="selector-class">.SET_WALLPAPER</span></span><br><span class="line">android<span class="selector-class">.permission</span><span class="selector-class">.SET_WALLPAPER_HINTS</span></span><br><span class="line">android<span class="selector-class">.permission</span><span class="selector-class">.SUBSCRIBED_FEEDS_READ</span></span><br><span class="line">android<span class="selector-class">.permission</span><span class="selector-class">.TRANSMIT_IR</span></span><br><span class="line">android<span class="selector-class">.permission</span><span class="selector-class">.USE_FINGERPRINT</span></span><br><span class="line">android<span class="selector-class">.permission</span><span class="selector-class">.VIBRATE</span></span><br><span class="line">android<span class="selector-class">.permission</span><span class="selector-class">.WAKE_LOCK</span></span><br><span class="line">android<span class="selector-class">.permission</span><span class="selector-class">.WRITE_SYNC_SETTINGS</span></span><br><span class="line">com<span class="selector-class">.android</span><span class="selector-class">.alarm</span><span class="selector-class">.permission</span><span class="selector-class">.SET_ALARM</span></span><br><span class="line">com<span class="selector-class">.android</span><span class="selector-class">.launcher</span><span class="selector-class">.permission</span><span class="selector-class">.INSTALL_SHORTCUT</span></span><br><span class="line">com<span class="selector-class">.android</span><span class="selector-class">.launcher</span><span class="selector-class">.permission</span><span class="selector-class">.UNINSTALL_SHORTCUT</span></span><br></pre></td></tr></table></figure>
+<h4 id="危险权限"><a href="#危险权限" class="headerlink" title="危险权限"></a>危险权限</h4><ul>
+<li>查看危险权限</li>
+</ul>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">可以通过adb <span class="keyword">shell</span><span class="bash"> pm list permissions -d -g进行查看(Windows使用adb 命令首先需要自行配置环境变量)</span></span><br></pre></td></tr></table></figure>
+<p><img src="https://github.com/maoqitian/MaoMdPhoto/raw/master/Android%20%E8%BF%90%E8%A1%8C%E6%97%B6%E6%9D%83%E9%99%90/adb%20%E6%9F%A5%E7%9C%8B%E5%8D%B1%E9%99%A9%E6%9D%83%E9%99%90.png" alt="adb查看危险权限"></p>
+<pre><code>- 危险权限会授予应用访问用户隐私数据的权限。如果您的应用在清单中列出了正常权限，系统将自动授予该权限。如果您列出了危险权限，则用户在清单文件中列出的同时还必须在触发使用相应功能的时候让用户同意应用使用这些权限
+
+![危险权限列表](https://github.com/maoqitian/MaoMdPhoto/raw/master/Android%20%E8%BF%90%E8%A1%8C%E6%97%B6%E6%9D%83%E9%99%90/%E5%8D%B1%E9%99%A9%E6%9D%83%E9%99%90.png)
+</code></pre><ul>
+<li>由危险权限的表可以看出，危险权限都是一组一组出现的，并且你只要授予一组权限的其中一个，那么该组危险权限的其他权限也同样被授予了（例如，如果某应用已经请求并且被授予了READ_CONTACTS 权限，然后它又请求WRITE_CONTACTS，系统将立即授予该权限）<h4 id="使用权限"><a href="#使用权限" class="headerlink" title="使用权限"></a>使用权限</h4></li>
+<li>当我们新建一个Android应用的时候，默认应用是没有有申请任何权限的，我们不管需要什么权限，首先需在清单文件中使用<uses-permission>标签声明<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">manifest</span> <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span></span></span><br><span class="line"><span class="tag">  <span class="attr">package</span>=<span class="string">"com.android.app.myapp"</span> &gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">"android.permission.RECEIVE_SMS"</span> /&gt;</span></span><br><span class="line">  ...</span><br><span class="line"> <span class="tag">&lt;/<span class="name">manifest</span>&gt;</span></span><br></pre></td></tr></table></figure>
+</uses-permission></li>
+</ul>
+<h3 id="权限相关API"><a href="#权限相关API" class="headerlink" title="权限相关API"></a>权限相关API</h3><h4 id="检查权限"><a href="#检查权限" class="headerlink" title="检查权限"></a>检查权限</h4><ul>
+<li>当我们应用需要危险的权限的时候，每次执行操作都需要检查是否授予了危险权限，检查是否具有该权限我们使用ContextCompat.checkSelfPermission() 方法<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> permissionCheck = ContextCompat.checkSelfPermission(thisActivity,</span><br><span class="line">     Manifest.permission.WRITE_CALENDAR);</span><br><span class="line">     </span><br><span class="line"><span class="comment">//如果具有该权限，则方法返回PackageManager.PERMISSION_GRANTED，并且应用可以</span></span><br><span class="line"><span class="comment">//继续操作。如果应用不具有此权限，方法将返回 PERMISSION_DENIED，且应用必须明确向用户要求权限</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h4 id="请求获取权限"><a href="#请求获取权限" class="headerlink" title="请求获取权限"></a>请求获取权限</h4><ul>
+<li>当我们应用某个功能操作需要危险权限的申请，则我们可以调用ActivityCompat.requestPermissions的方法来获取相应的权限。该方法异步运行：它会立即返回，并且在用户响应对话框之后，系统会使用结果调用应用的回调方法，将应用传递的相同请求代码传递到ActivityCompat.requestPermissions方法。</li>
+<li>以下代码可以检查应用是否具备读取用户联系人的权限，并根据需要请求该权限<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (ContextCompat.checkSelfPermission(thisActivity,</span><br><span class="line">              Manifest.permission.READ_CONTACTS)</span><br><span class="line">      != PackageManager.PERMISSION_GRANTED) &#123;</span><br><span class="line">  <span class="comment">//是否具有该读取联系人权限</span></span><br><span class="line">  </span><br><span class="line">  <span class="keyword">if</span> (ActivityCompat.shouldShowRequestPermissionRationale(thisActivity,</span><br><span class="line">          Manifest.permission.READ_CONTACTS)) &#123;</span><br><span class="line"></span><br><span class="line">      <span class="comment">//判断是否需要向用户解释，为什么需要这些权限。有时候用户会不理解应用程序为什么需要这些权限。</span></span><br><span class="line">      <span class="comment">//这个方法只有在APP请求过某一权限且用户禁止APP使用该权限的时候返回true。在用户授权了权限和禁止权限时勾选了“Don't ask again”选项的情况下都会返回false</span></span><br><span class="line">      <span class="comment">//也就是说如果进入到这里，就说明该权限曾经被拒绝过</span></span><br><span class="line">      </span><br><span class="line">      <span class="comment">/**</span></span><br><span class="line"><span class="comment">      被拒绝又想再次申请可跳转应用信息界面授予权限</span></span><br><span class="line"><span class="comment">      Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);</span></span><br><span class="line"><span class="comment">      intent.setData(Uri.fromParts("package", context.getPackageName(), null));</span></span><br><span class="line"><span class="comment">      startActivity(intent);</span></span><br><span class="line"><span class="comment">      */</span></span><br><span class="line"></span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line"></span><br><span class="line">      <span class="comment">//申请权限</span></span><br><span class="line"></span><br><span class="line">      ActivityCompat.requestPermissions(thisActivity,</span><br><span class="line">              <span class="keyword">new</span> String[]&#123;Manifest.permission.READ_CONTACTS&#125;,</span><br><span class="line">              MY_PERMISSIONS_REQUEST_READ_CONTACTS);</span><br><span class="line"></span><br><span class="line">      <span class="comment">// MY_PERMISSIONS_REQUEST_READ_CONTACTS is an</span></span><br><span class="line">      <span class="comment">// app-defined int constant. The callback method gets the</span></span><br><span class="line">      <span class="comment">// result of the request.</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h4 id="处理权限请求的响应"><a href="#处理权限请求的响应" class="headerlink" title="处理权限请求的响应"></a>处理权限请求的响应</h4><ul>
+<li>当权限申请提示框与用户交互的时候，我们开发人员必须知道用户到底是否同意应用的权限申请。所以用户响应时，Android系统将调用应用的 onRequestPermissionsResult() 方法，向其传递用户响应 </li>
+<li>延续上面读取联系人的例子</li>
+</ul>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * </span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> requestCode 申请权限传入的请求码</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> permissions 申请权限的数组</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> grantResults 请求的结果（用于区分上一个参数permissions中的权限有没有被授予，permissions和grantResults两个数组大小是一样的，具体值和上方提到的PackageManager中的两个常量做比较）</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> onRequestPermissionsResult(<span class="keyword">int</span> requestCode,</span><br><span class="line">    String permissions[], <span class="keyword">int</span>[] grantResults) &#123;</span><br><span class="line"> <span class="keyword">switch</span> (requestCode) &#123;</span><br><span class="line">    <span class="keyword">case</span> MY_PERMISSIONS_REQUEST_READ_CONTACTS: &#123;</span><br><span class="line">        <span class="comment">// If request is cancelled, the result arrays are empty.</span></span><br><span class="line">        <span class="keyword">if</span> (grantResults.length &gt; <span class="number">0</span></span><br><span class="line">            &amp;&amp; grantResults[<span class="number">0</span>] == PackageManager.PERMISSION_GRANTED) &#123;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// permission was granted, yay! Do the</span></span><br><span class="line">            <span class="comment">// contacts-related task you need to do.</span></span><br><span class="line">            <span class="comment">//用户同意权限申请，继续应用操作</span></span><br><span class="line"></span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// permission denied, boo! Disable the</span></span><br><span class="line">            <span class="comment">// functionality that depends on this permission.</span></span><br><span class="line">            <span class="comment">//用户拒绝权限申请，提示用户应用的操作需要该权限</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// other 'case' lines to check for other</span></span><br><span class="line">    <span class="comment">// permissions this app might request</span></span><br><span class="line">   &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<h4 id="运行时权限小例子"><a href="#运行时权限小例子" class="headerlink" title="运行时权限小例子"></a>运行时权限小例子</h4><ul>
+<li>读取联系人列表完整例子<figure class="highlight processing"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line">  <span class="keyword">public</span> class MainActivity extends AppCompatActivity &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="built_in">int</span> MY_PERMISSIONS_REQUEST_READ_CONTACTS = <span class="number">1</span>;</span><br><span class="line">     <span class="comment">//保存联系人</span></span><br><span class="line">    <span class="keyword">public</span> List&lt;<span class="keyword">String</span>&gt; list = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> onCreate(Bundle savedInstanceState) &#123;</span><br><span class="line">    <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line">    setContentView(R.layout.activity_main);</span><br><span class="line">    readContacts();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//读取联系人</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> readContacts()&#123;</span><br><span class="line">    <span class="keyword">if</span>(ContextCompat.checkSelfPermission(<span class="keyword">this</span>, Manifest.permission.READ_CONTACTS)</span><br><span class="line">            != PackageManager.PERMISSION_GRANTED)&#123;</span><br><span class="line">      <span class="comment">//申请权限</span></span><br><span class="line">        <span class="comment">//申请权限</span></span><br><span class="line">        <span class="keyword">if</span> (ActivityCompat.shouldShowRequestPermissionRationale(<span class="keyword">this</span>,</span><br><span class="line">                Manifest.permission.READ_CONTACTS)) &#123;</span><br><span class="line">            <span class="comment">//之前申请权限的时候拒绝过 ，向用户解释为什么需要该权限</span></span><br><span class="line">            Toast.makeText(MainActivity.<span class="keyword">this</span>, <span class="string">"Permission Denied，Show an expanation to the user *asynchronously* -- don't block"</span>, Toast.LENGTH_SHORT).show();</span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">            ActivityCompat.requestPermissions(<span class="keyword">this</span>,</span><br><span class="line">                    <span class="keyword">new</span> <span class="keyword">String</span>[]&#123;Manifest.permission.READ_CONTACTS&#125;,</span><br><span class="line">                    MY_PERMISSIONS_REQUEST_READ_CONTACTS);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">      &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">//获取联系人列表</span></span><br><span class="line">        list=readContact();</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> onRequestPermissionsResult(<span class="built_in">int</span> requestCode, @NonNull <span class="keyword">String</span>[] permissions, @NonNull <span class="built_in">int</span>[] grantResults) &#123;</span><br><span class="line">    <span class="keyword">if</span>(requestCode == MY_PERMISSIONS_REQUEST_READ_CONTACTS)&#123;</span><br><span class="line">        <span class="keyword">if</span> (grantResults[<span class="number">0</span>] == PackageManager.PERMISSION_GRANTED)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">//获取联系人列表</span></span><br><span class="line">            list=readContact();</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// Permission Denied</span></span><br><span class="line">            Toast.makeText(MainActivity.<span class="keyword">this</span>, <span class="string">"Permission Denied"</span>, Toast.LENGTH_SHORT).show();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">super</span>.onRequestPermissionsResult(requestCode, permissions, grantResults);</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="comment">//读取联系人</span></span><br><span class="line">   <span class="keyword">public</span> List&lt;<span class="keyword">String</span>&gt; readContact()&#123;</span><br><span class="line">    List&lt;<span class="keyword">String</span>&gt; list = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    Cursor <span class="built_in">cursor</span> = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">//cursor指针 query询问 contract协议 kinds种类</span></span><br><span class="line">        <span class="built_in">cursor</span> = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, <span class="keyword">null</span>, <span class="keyword">null</span>, <span class="keyword">null</span>, <span class="keyword">null</span>);</span><br><span class="line">        <span class="keyword">if</span> (<span class="built_in">cursor</span> != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">while</span> (<span class="built_in">cursor</span>.moveToNext()) &#123;</span><br><span class="line">                <span class="keyword">String</span> displayName = <span class="built_in">cursor</span>.getString(<span class="built_in">cursor</span>.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));</span><br><span class="line">                <span class="keyword">String</span> number = <span class="built_in">cursor</span>.getString(<span class="built_in">cursor</span>.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));</span><br><span class="line">                list.<span class="built_in">add</span>(displayName + <span class="string">'\n'</span> + number);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> list;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="built_in">cursor</span> != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="built_in">cursor</span>.close();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">   &#125;</span><br><span class="line"> &#125;</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line"><span class="comment">//清单文件中别忘了加上 </span></span><br><span class="line">&lt;uses-permission android:name=<span class="string">"android.permission.READ_CONTACTS"</span>/&gt;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="热门框架了解"><a href="#热门框架了解" class="headerlink" title="热门框架了解"></a>热门框架了解</h3><ul>
+<li>AndPermission（严振杰大大的框架）</li>
+<li>项目地址<br>  <a href="https://github.com/yanzhenjie/AndPermission" target="_blank" rel="noopener">https://github.com/yanzhenjie/AndPermission</a></li>
+<li><p>该框架也是日常开发用得比较多的一个框架，该框架一句话搞定权限申请，还是比较方便的</p>
+<figure class="highlight lasso"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">AndPermission.<span class="keyword">with</span>(this).runtime()</span><br><span class="line">            .permission(Permission.<span class="keyword">Group</span>.STORAGE)</span><br><span class="line">            .onGranted(<span class="literal">new</span> Action&lt;<span class="built_in">List</span>&lt;<span class="built_in">String</span>&gt;&gt;() &#123;</span><br><span class="line">                @Override</span><br><span class="line">                <span class="keyword">public</span> <span class="literal">void</span> onAction(<span class="built_in">List</span>&lt;<span class="built_in">String</span>&gt; <span class="built_in">data</span>) &#123;</span><br><span class="line"></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;).onDenied(<span class="literal">new</span> Action&lt;<span class="built_in">List</span>&lt;<span class="built_in">String</span>&gt;&gt;() &#123;</span><br><span class="line">        @Override</span><br><span class="line">        <span class="keyword">public</span> <span class="literal">void</span> onAction(<span class="built_in">List</span>&lt;<span class="built_in">String</span>&gt; <span class="built_in">data</span>) &#123;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;).start();</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>通过阅读框架源码，可以看到这个框架的核心就是PermissionActivity,它是一个没有界面的Activity,所有的权限申请都由它来发起，并进行相应操作的回调，结合前面了解的运行时权限的知识，相信这个Activity你可以很轻易就了解。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br></pre></td><td class="code"><pre><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * &lt;p&gt;</span></span><br><span class="line"><span class="comment">     * Request permission.</span></span><br><span class="line"><span class="comment">     * &lt;/p&gt;</span></span><br><span class="line"><span class="comment">     * Created by Yan Zhenjie on 2017/4/27.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">PermissionActivity</span> <span class="keyword">extends</span> <span class="title">Activity</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String KEY_INPUT_OPERATION = <span class="string">"KEY_INPUT_OPERATION"</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> VALUE_INPUT_PERMISSION = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> VALUE_INPUT_PERMISSION_SETTING = <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> VALUE_INPUT_INSTALL = <span class="number">3</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> VALUE_INPUT_OVERLAY = <span class="number">4</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> VALUE_INPUT_ALERT_WINDOW = <span class="number">5</span>;</span><br><span class="line"></span><br><span class="line">     <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String KEY_INPUT_PERMISSIONS = <span class="string">"KEY_INPUT_PERMISSIONS"</span>;</span><br><span class="line"></span><br><span class="line">     <span class="keyword">private</span> <span class="keyword">static</span> RequestListener sRequestListener;</span><br><span class="line"></span><br><span class="line">     <span class="comment">/**</span></span><br><span class="line"><span class="comment">      * Request for permissions.</span></span><br><span class="line"><span class="comment">      */</span></span><br><span class="line">     <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">requestPermission</span><span class="params">(Context context, String[] permissions, RequestListener requestListener)</span> </span>&#123;</span><br><span class="line">     PermissionActivity.sRequestListener = requestListener;</span><br><span class="line"></span><br><span class="line">     Intent intent = <span class="keyword">new</span> Intent(context, PermissionActivity.class);</span><br><span class="line">     intent.putExtra(KEY_INPUT_OPERATION, VALUE_INPUT_PERMISSION);</span><br><span class="line">     intent.putExtra(KEY_INPUT_PERMISSIONS, permissions);</span><br><span class="line">     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);</span><br><span class="line">     context.startActivity(intent);</span><br><span class="line">     &#125;</span><br><span class="line"></span><br><span class="line">     <span class="comment">/**</span></span><br><span class="line"><span class="comment">      * Request for setting.</span></span><br><span class="line"><span class="comment">      */</span></span><br><span class="line">     <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">permissionSetting</span><span class="params">(Context context, RequestListener requestListener)</span> </span>&#123;</span><br><span class="line">     PermissionActivity.sRequestListener = requestListener;</span><br><span class="line"></span><br><span class="line">     Intent intent = <span class="keyword">new</span> Intent(context, PermissionActivity.class);</span><br><span class="line">     intent.putExtra(KEY_INPUT_OPERATION, VALUE_INPUT_PERMISSION_SETTING);</span><br><span class="line">     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);</span><br><span class="line">     context.startActivity(intent);</span><br><span class="line">     &#125;</span><br><span class="line"></span><br><span class="line">     <span class="comment">/**</span></span><br><span class="line"><span class="comment">      * Request for package install.</span></span><br><span class="line"><span class="comment">      */</span></span><br><span class="line">     <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">requestInstall</span><span class="params">(Context context, RequestListener requestListener)</span>  </span>&#123;</span><br><span class="line">     PermissionActivity.sRequestListener = requestListener;</span><br><span class="line"></span><br><span class="line">     Intent intent = <span class="keyword">new</span> Intent(context, PermissionActivity.class);</span><br><span class="line">     intent.putExtra(KEY_INPUT_OPERATION, VALUE_INPUT_INSTALL);</span><br><span class="line">     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);</span><br><span class="line">     context.startActivity(intent);</span><br><span class="line">     &#125;</span><br><span class="line"></span><br><span class="line">     <span class="comment">/**</span></span><br><span class="line"><span class="comment">      * Request for overlay.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">     <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">requestOverlay</span><span class="params">(Context context, RequestListener requestListener)</span> </span>&#123;</span><br><span class="line">     PermissionActivity.sRequestListener = requestListener;</span><br><span class="line"></span><br><span class="line">     Intent intent = <span class="keyword">new</span> Intent(context, PermissionActivity.class);</span><br><span class="line">     intent.putExtra(KEY_INPUT_OPERATION, VALUE_INPUT_OVERLAY);</span><br><span class="line">     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);</span><br><span class="line">     context.startActivity(intent);</span><br><span class="line">     &#125;</span><br><span class="line"></span><br><span class="line">     <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Request for alert window.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">     <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">requestAlertWindow</span><span class="params">(Context context, RequestListener requestListener)</span> </span>&#123;</span><br><span class="line">     PermissionActivity.sRequestListener = requestListener;</span><br><span class="line"></span><br><span class="line">     Intent intent = <span class="keyword">new</span> Intent(context, PermissionActivity.class);</span><br><span class="line">     intent.putExtra(KEY_INPUT_OPERATION, VALUE_INPUT_ALERT_WINDOW);</span><br><span class="line">     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);</span><br><span class="line">     context.startActivity(intent);</span><br><span class="line">     &#125;</span><br><span class="line"></span><br><span class="line">     <span class="meta">@Override</span></span><br><span class="line">     <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">     <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line">     Intent intent = getIntent();</span><br><span class="line">     <span class="keyword">int</span> operation = intent.getIntExtra(KEY_INPUT_OPERATION, <span class="number">0</span>);</span><br><span class="line">     <span class="keyword">switch</span> (operation) &#123;</span><br><span class="line">         <span class="keyword">case</span> VALUE_INPUT_PERMISSION: &#123;</span><br><span class="line">             String[] permissions = intent.getStringArrayExtra(KEY_INPUT_PERMISSIONS);</span><br><span class="line">             <span class="keyword">if</span> (permissions != <span class="keyword">null</span> &amp;&amp; sRequestListener != <span class="keyword">null</span>) &#123;</span><br><span class="line">                 requestPermissions(permissions, VALUE_INPUT_PERMISSION);</span><br><span class="line">             &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                 finish();</span><br><span class="line">             &#125;</span><br><span class="line">             <span class="keyword">break</span>;</span><br><span class="line">         &#125;</span><br><span class="line">         <span class="keyword">case</span> VALUE_INPUT_PERMISSION_SETTING: &#123;</span><br><span class="line">             <span class="keyword">if</span> (sRequestListener != <span class="keyword">null</span>) &#123;</span><br><span class="line">                 RuntimeSettingPage setting = <span class="keyword">new</span> RuntimeSettingPage(<span class="keyword">new</span> ContextSource(<span class="keyword">this</span>));</span><br><span class="line">                 setting.start(VALUE_INPUT_PERMISSION_SETTING);</span><br><span class="line">             &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                 finish();</span><br><span class="line">             &#125;</span><br><span class="line">             <span class="keyword">break</span>;</span><br><span class="line">         &#125;</span><br><span class="line">         <span class="keyword">case</span> VALUE_INPUT_INSTALL: &#123;</span><br><span class="line">             <span class="keyword">if</span> (sRequestListener != <span class="keyword">null</span>) &#123;</span><br><span class="line">                 Intent manageIntent = <span class="keyword">new</span> Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES);</span><br><span class="line">                 manageIntent.setData(Uri.fromParts(<span class="string">"package"</span>, getPackageName(), <span class="keyword">null</span>));</span><br><span class="line">                 startActivityForResult(manageIntent, VALUE_INPUT_INSTALL);</span><br><span class="line">             &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                 finish();</span><br><span class="line">             &#125;</span><br><span class="line">             <span class="keyword">break</span>;</span><br><span class="line">         &#125;</span><br><span class="line">         <span class="keyword">case</span> VALUE_INPUT_OVERLAY: &#123;</span><br><span class="line">             <span class="keyword">if</span> (sRequestListener != <span class="keyword">null</span>) &#123;</span><br><span class="line">                 OverlaySettingPage settingPage = <span class="keyword">new</span> OverlaySettingPage(<span class="keyword">new</span> ContextSource(<span class="keyword">this</span>));</span><br><span class="line">                 settingPage.start(VALUE_INPUT_OVERLAY);</span><br><span class="line">             &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                 finish();</span><br><span class="line">             &#125;</span><br><span class="line">             <span class="keyword">break</span>;</span><br><span class="line">         &#125;</span><br><span class="line">         <span class="keyword">case</span> VALUE_INPUT_ALERT_WINDOW: &#123;</span><br><span class="line">             <span class="keyword">if</span> (sRequestListener != <span class="keyword">null</span>) &#123;</span><br><span class="line">                 AlertWindowSettingPage settingPage = <span class="keyword">new</span> AlertWindowSettingPage(<span class="keyword">new</span> ContextSource(<span class="keyword">this</span>));</span><br><span class="line">                 settingPage.start(VALUE_INPUT_ALERT_WINDOW);</span><br><span class="line">             &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                 finish();</span><br><span class="line">             &#125;</span><br><span class="line">             <span class="keyword">break</span>;</span><br><span class="line">         &#125;</span><br><span class="line">         <span class="keyword">default</span>: &#123;</span><br><span class="line">             <span class="keyword">throw</span> <span class="keyword">new</span> AssertionError(<span class="string">"This should not be the case."</span>);</span><br><span class="line">         &#125;</span><br><span class="line">     &#125;</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"> <span class="meta">@Override</span></span><br><span class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onRequestPermissionsResult</span><span class="params">(<span class="keyword">int</span> requestCode, String[] permissions, <span class="keyword">int</span>[] grantResults)</span> </span>&#123;</span><br><span class="line">     <span class="keyword">if</span> (sRequestListener != <span class="keyword">null</span>) &#123;</span><br><span class="line">         sRequestListener.onRequestCallback();</span><br><span class="line">     &#125;</span><br><span class="line">     finish();</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"> <span class="meta">@Override</span></span><br><span class="line"> <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onActivityResult</span><span class="params">(<span class="keyword">int</span> requestCode, <span class="keyword">int</span> resultCode, Intent data)</span> </span>&#123;</span><br><span class="line">     <span class="keyword">if</span> (sRequestListener != <span class="keyword">null</span>) &#123;</span><br><span class="line">         sRequestListener.onRequestCallback();</span><br><span class="line">     &#125;</span><br><span class="line">     finish();</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"> <span class="meta">@Override</span></span><br><span class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">onKeyDown</span><span class="params">(<span class="keyword">int</span> keyCode, KeyEvent event)</span> </span>&#123;</span><br><span class="line">     <span class="keyword">if</span> (keyCode == KeyEvent.KEYCODE_BACK) &#123;</span><br><span class="line">         <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">     &#125;</span><br><span class="line">     <span class="keyword">return</span> <span class="keyword">super</span>.onKeyDown(keyCode, event);</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"> <span class="meta">@Override</span></span><br><span class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">finish</span><span class="params">()</span> </span>&#123;</span><br><span class="line">     sRequestListener = <span class="keyword">null</span>;</span><br><span class="line">     <span class="keyword">super</span>.finish();</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"> <span class="comment">/**</span></span><br><span class="line"><span class="comment">  * permission callback.</span></span><br><span class="line"><span class="comment">  */</span></span><br><span class="line"> <span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">RequestListener</span> </span>&#123;</span><br><span class="line">     <span class="function"><span class="keyword">void</span> <span class="title">onRequestCallback</span><span class="params">()</span></span>;</span><br><span class="line"> &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="最后说点"><a href="#最后说点" class="headerlink" title="最后说点"></a>最后说点</h3><ul>
+<li>看过不一定记得，记得不一定会写，会写不代表不会忘记，所以记下来是最好的选择。好了，又通过一篇文章让我对Android运行时权限有了更深入的了解。文章中如果有错误，请大家给我提出来，大家一起学习进步，如果觉得我的文章给予你帮助，也请给我一个喜欢和关注。</li>
+<li><p>参考链接:</p>
+<ul>
+<li>《Android进阶之光》</li>
+<li><p><a href="https://developer.android.google.cn/training/permissions/requesting#handle-response" target="_blank" rel="noopener">在运行时请求权限</a></p>
+</li>
+<li><p><a href="https://developer.android.google.cn/guide/topics/security/permissions#permissions" target="_blank" rel="noopener">系统权限</a></p>
+</li>
+</ul>
+</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+ <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-heart"></i>感谢阅读-------------</div>
+    
+</div>
+
+    
+ </div>	
+
+    
+
+    
+
+    
+      <div>
+        <script src="https://cdn.bootcss.com/jquery/2.0.0/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<ul class="post-copyright">
+  <li class="post-copyright-title">
+    <strong>本文标题：</strong>
+    Android运行时权限机制解析
+  </li>
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    maoqitian
+  </li>
+  <li class="post-copyright-created_at">
+    <strong>发布时间：</strong>
+    2019-01-19
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://www.maoqitian.com/2019/01/19/Android运行时权限机制解析/" title="Android运行时权限机制解析">https://www.maoqitian.com/2019/01/19/Android运行时权限机制解析/</a>
+	<span class="copy-path" title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="https://www.maoqitian.com/2019/01/19/Android运行时权限机制解析/" aria-label="复制成功！"></i></span>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.zh" rel="external nofollow" target="_blank">CC BY-NC-ND 4.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+<script> 
+    var clipboard = new Clipboard('.fa-clipboard');
+    $(".fa-clipboard").click(function(){
+      clipboard.on('success', function(){
+        swal({
+          title: "",
+          text: '复制文章链接成功',
+          icon: "success",
+          showConfirmButton: true
+          });
+	    });
+    });  
+</script>
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"><i class="fa fa-tag"></i> Android</a>
+          
+            <a href="/tags/Android运行时权限/" rel="tag"><i class="fa fa-tag"></i> Android运行时权限</a>
+          
+            <a href="/tags/permission/" rel="tag"><i class="fa fa-tag"></i> permission</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/01/16/接口和抽象类/" rel="next" title="Java接口和抽象类是什么，有什么区别">
+                <i class="fa fa-chevron-left"></i> Java接口和抽象类是什么，有什么区别
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/01/20/Java中的线程池/" rel="prev" title="Java中的线程池和作用">
+                Java中的线程池和作用 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "1",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      },
+      "slide": {
+        "bdImg": "5",
+        "bdPos": "left",
+        "bdTop": "100"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC80MjU2MS8xOTEwOA=="></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+      <div id="sidebar-dimmer"></div>
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="maoqitian">
+            
+              <p class="site-author-name" itemprop="name">maoqitian</p>
+              <p class="site-description motion-element" itemprop="description">“life was like a box a chocolates, never know what you're gonna get.”</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">69</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/maoqitian" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://juejin.im/user/59e956626fb9a045204b57d4" target="_blank" title="掘金">
+                      
+                        <i class="fa fa-fw fa-drupal"></i>掘金</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.jianshu.com/u/f58cd7ff1a08" target="_blank" title="简书">
+                      
+                        <i class="fa fa-fw fa-book"></i>简书</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:maoqitian068@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-pagelines"></i>
+                友情链接
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://www.wanandroid.com/" title="玩Android" target="_blank">玩Android</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://kymjs.com" title="开源实验室" target="_blank">开源实验室</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://liuwangshu.cn/" title="刘望舒的博客" target="_blank">刘望舒的博客</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#权限介绍"><span class="nav-number">1.</span> <span class="nav-text">权限介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#权限类别"><span class="nav-number">2.</span> <span class="nav-text">权限类别</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#正常权限"><span class="nav-number">2.1.</span> <span class="nav-text">正常权限</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#危险权限"><span class="nav-number">2.2.</span> <span class="nav-text">危险权限</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用权限"><span class="nav-number">2.3.</span> <span class="nav-text">使用权限</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#权限相关API"><span class="nav-number">3.</span> <span class="nav-text">权限相关API</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#检查权限"><span class="nav-number">3.1.</span> <span class="nav-text">检查权限</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#请求获取权限"><span class="nav-number">3.2.</span> <span class="nav-text">请求获取权限</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#处理权限请求的响应"><span class="nav-number">3.3.</span> <span class="nav-text">处理权限请求的响应</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#运行时权限小例子"><span class="nav-number">3.4.</span> <span class="nav-text">运行时权限小例子</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#热门框架了解"><span class="nav-number">4.</span> <span class="nav-text">热门框架了解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#最后说点"><span class="nav-number">5.</span> <span class="nav-text">最后说点</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">maoqitian</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i> 本站访客数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i> 本站总访问量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+  <div class="bg_content">
+  <canvas id="canvas"></canvas>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("VcqMEKTUVGDpIwJn6RGgftJk-gzGzoHsz", "wpViln3oXrO2G2WMVVxfqvuh");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 自定义页面背景动效 -->
+<script type="text/javascript" src="/js/src/dynamic_bg.js"></script>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>

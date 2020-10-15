@@ -1,0 +1,1690 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-center-atom.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i["DaoVoiceObject"]=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;a.charset="utf-8";m.parentNode.insertBefore(a,m)})(window,document,"script",('https:' == document.location.protocol ? 'https:' : 'http:') + "//widget.daovoice.io/widget/aa90d435.js","daovoice")
+  daovoice('init', {
+      app_id: "aa90d435"
+    });
+  daovoice('update');
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic|PT Mono:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Android,源码分析,Glide,图片加载,LRU,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="maoqitian 个人博客" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="上一篇文章从源码角度深入理解Glide（上）中，我们已经把Glide加载图片的基本流程走了一遍，想必你已经对Glide的加载原理有了新的认识并且见识到了Glide源码的复杂逻辑，在我们感叹Glide源码复杂的同时我们也忽略了Glide加载图片过程的其它细节，特别是缓存方面，我们在上一篇文章中对于缓存的处理都是跳过的，这一篇文章我们就从Glide的缓存开始再次对Glide进行深入理解。">
+<meta name="keywords" content="Android,源码分析,Glide,图片加载,LRU">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从源码角度深入理解Glide（下）">
+<meta property="og:url" content="https://www.maoqitian.com/2019/02/19/从源码角度深入理解Glide（下）/index.html">
+<meta property="og:site_name" content="maoqitian 个人博客">
+<meta property="og:description" content="上一篇文章从源码角度深入理解Glide（上）中，我们已经把Glide加载图片的基本流程走了一遍，想必你已经对Glide的加载原理有了新的认识并且见识到了Glide源码的复杂逻辑，在我们感叹Glide源码复杂的同时我们也忽略了Glide加载图片过程的其它细节，特别是缓存方面，我们在上一篇文章中对于缓存的处理都是跳过的，这一篇文章我们就从Glide的缓存开始再次对Glide进行深入理解。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/bumptech/glide/master/static/glide_logo.png">
+<meta property="og:image" content="https://github.com/maoqitian/MaoMdPhoto/raw/39c2ad856ab065e47c96d50f8e28cd151c142750/%E4%BB%8E%E6%BA%90%E7%A0%81%E8%A7%92%E5%BA%A6%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Glide/%E8%B5%84%E6%BA%90%E7%AE%A1%E7%90%86%E6%8F%8F%E8%BF%B0.png">
+<meta property="og:image" content="https://github.com/maoqitian/MaoMdPhoto/raw/master/%E4%BB%8E%E6%BA%90%E7%A0%81%E8%A7%92%E5%BA%A6%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Glide/LRU%E5%9B%BE.jpg">
+<meta property="og:image" content="https://github.com/maoqitian/MaoMdPhoto/raw/master/%E4%BB%8E%E6%BA%90%E7%A0%81%E8%A7%92%E5%BA%A6%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Glide/Glide%E5%86%85%E5%AD%98%E7%BC%93%E5%AD%98%E6%9C%BA%E5%88%B6%E7%A4%BA%E6%84%8F%E5%9B%BE.jpg">
+<meta property="og:image" content="https://github.com/maoqitian/MaoMdPhoto/raw/master/%E4%BB%8E%E6%BA%90%E7%A0%81%E8%A7%92%E5%BA%A6%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Glide/Glide%E7%A3%81%E7%9B%98%E7%BC%93%E5%AD%98%E6%9C%BA%E5%88%B6%E7%A4%BA%E6%84%8F%E5%9B%BE.jpg">
+<meta property="og:image" content="https://github.com/maoqitian/MaoMdPhoto/raw/master/%E4%BB%8E%E6%BA%90%E7%A0%81%E8%A7%92%E5%BA%A6%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Glide/Target%E7%BB%A7%E6%89%BF%E5%85%B3%E7%B3%BB%E5%9B%BE.png">
+<meta property="og:updated_time" content="2020-10-15T14:26:43.688Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="从源码角度深入理解Glide（下）">
+<meta name="twitter:description" content="上一篇文章从源码角度深入理解Glide（上）中，我们已经把Glide加载图片的基本流程走了一遍，想必你已经对Glide的加载原理有了新的认识并且见识到了Glide源码的复杂逻辑，在我们感叹Glide源码复杂的同时我们也忽略了Glide加载图片过程的其它细节，特别是缓存方面，我们在上一篇文章中对于缓存的处理都是跳过的，这一篇文章我们就从Glide的缓存开始再次对Glide进行深入理解。">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/bumptech/glide/master/static/glide_logo.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":true},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://www.maoqitian.com/2019/02/19/从源码角度深入理解Glide（下）/">
+
+
+
+
+
+  <title>从源码角度深入理解Glide（下） | maoqitian 个人博客</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+	<!--  -->
+    <a href="https://github.com/maoqitian" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewbox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">maoqitian 个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.maoqitian.com/2019/02/19/从源码角度深入理解Glide（下）/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="maoqitian">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="maoqitian 个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">从源码角度深入理解Glide（下）</h1>
+        
+
+        <div class="post-meta">
+		   
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-02-19T22:01:24+08:00">
+                2019-02-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android热门框架解析/" itemprop="url" rel="index">
+                    <span itemprop="name">Android热门框架解析</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2019/02/19/从源码角度深入理解Glide（下）/" class="leancloud_visitors" data-flag-title="从源码角度深入理解Glide（下）">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  9.9k字
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  42分钟
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="https://raw.githubusercontent.com/bumptech/glide/master/static/glide_logo.png" alt="image"></p>
+<blockquote>
+<p>上一篇文章<a href="https://www.maoqitian.com/2019/02/19/%E4%BB%8E%E6%BA%90%E7%A0%81%E8%A7%92%E5%BA%A6%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3glide%EF%BC%88%E4%B8%8A%EF%BC%89/">从源码角度深入理解Glide（上）</a>中，我们已经把Glide加载图片的基本流程走了一遍，想必你已经对Glide的加载原理有了新的认识并且见识到了Glide源码的复杂逻辑，在我们感叹Glide源码复杂的同时我们也忽略了Glide加载图片过程的其它细节，特别是缓存方面，我们在上一篇文章中对于缓存的处理都是跳过的，这一篇文章我们就从Glide的缓存开始再次对Glide进行深入理解。<br><a id="more"></a></p>
+</blockquote>
+<h2 id="Glide缓存"><a href="#Glide缓存" class="headerlink" title="Glide缓存"></a>Glide缓存</h2><ul>
+<li>Glide加载默认情况下可以分为三级缓存，哪三级呢？他们分别是<strong>内存、磁盘和网络。</strong></li>
+<li><p>默认情况下，Glide 会在开始一个新的图片请求之前检查以下多级的缓存：</p>
+<ul>
+<li>1.活动资源 (Active Resources) - 现在是否有另一个 View 正在展示这张图片</li>
+<li>2.内存缓存 (Memory cache) - 该图片是否最近被加载过并仍存在于内存中</li>
+<li>3.资源类型（Resource） - 该图片是否之前曾被解码、转换并写入过磁盘缓存</li>
+<li>4.数据来源 (Data) - 构建这个图片的资源是否之前曾被写入过文件缓存</li>
+</ul>
+</li>
+<li>网络级别的加载我们已经在上一篇文章了解了，上面列出的前两种情况则是内存缓存，后两种情况则是磁盘缓存，如果以上四种情况都不存在，Glide则会通过返回到原始资源以取回数据（原始文件，Uri, Url（网络）等） <h3 id="缓存的key"><a href="#缓存的key" class="headerlink" title="缓存的key"></a>缓存的key</h3></li>
+<li>提起缓存，我们首先要明白，Glide中缓存的图片肯定不止一个，当我们加载图片的同时，如果缓存中有我们正在加载的图片，我们怎么找到这个图片的缓存呢？所以为了找到对应的缓存，则每一个缓存都有它对应的标识，这个标识在Glide中用接口Key来描述<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**Key 接口*/</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Key</span> </span>&#123;</span><br><span class="line">  String STRING_CHARSET_NAME = <span class="string">"UTF-8"</span>;</span><br><span class="line">  Charset CHARSET = Charset.forName(STRING_CHARSET_NAME);</span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">updateDiskCacheKey</span><span class="params">(@NonNull MessageDigest messageDigest)</span></span>;</span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">boolean</span> <span class="title">equals</span><span class="params">(Object o)</span></span>;</span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">int</span> <span class="title">hashCode</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h4 id="缓存Key的生成"><a href="#缓存Key的生成" class="headerlink" title="缓存Key的生成"></a>缓存Key的生成</h4><ul>
+<li><p>前面提到了缓存Key的接口，那这个缓存的Key实在哪里生成的，实现类又是什么呢？这我们就要看到加载发动机Engine类的load方法</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> EngineKeyFactory keyFactory;</span><br><span class="line"><span class="comment">/**Engine类的load方法*/</span></span><br><span class="line"><span class="keyword">public</span> &lt;R&gt; LoadStatus load(GlideContext glideContext,Object model, Key signature,<span class="keyword">int</span> width,<span class="keyword">int</span> height,<span class="keyword">Class</span>&lt;?&gt; resourceClass,<span class="keyword">Class</span>&lt;R&gt; transcodeClass,Priority priority,DiskCacheStrategy diskCacheStrategy,Map&lt;<span class="keyword">Class</span>&lt;?&gt;, Transformation&lt;?&gt;&gt; transformations,<span class="keyword">boolean</span> isTransformationRequired,<span class="keyword">boolean</span> isScaleOnlyOrNoTransform, <span class="keyword">Options</span> <span class="keyword">options</span>,<span class="keyword">boolean</span> isMemoryCacheable,<span class="keyword">boolean</span> useUnlimitedSourceExecutorPool,<span class="keyword">boolean</span> useAnimationPool,<span class="keyword">boolean</span> onlyRetrieveFromCache,ResourceCallback cb) &#123;</span><br><span class="line">    Util.assertMainThread();</span><br><span class="line">    <span class="keyword">long</span> startTime = VERBOSE_IS_LOGGABLE ? LogTime.getLogTime() : <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    EngineKey key = keyFactory.buildKey(model, signature, width, height, transformations,</span><br><span class="line">        resourceClass, transcodeClass, <span class="keyword">options</span>);</span><br><span class="line">    <span class="comment">//省略部分代码</span></span><br><span class="line">    ..........</span><br><span class="line">  &#125;</span><br><span class="line"><span class="comment">/**EngineKey类*/</span>  </span><br><span class="line"><span class="keyword">class</span> EngineKey <span class="keyword">implements</span> Key &#123;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">final</span> Object model;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">int</span> width;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">int</span> height;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">Class</span>&lt;?&gt; resourceClass;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">Class</span>&lt;?&gt; transcodeClass;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">final</span> Key signature;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">final</span> Map&lt;<span class="keyword">Class</span>&lt;?&gt;, Transformation&lt;?&gt;&gt; transformations;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">Options</span> <span class="keyword">options</span>;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">int</span> hashCode;</span><br><span class="line"></span><br><span class="line">  EngineKey(</span><br><span class="line">      Object model,</span><br><span class="line">      Key signature,</span><br><span class="line">      <span class="keyword">int</span> width,</span><br><span class="line">      <span class="keyword">int</span> height,</span><br><span class="line">      Map&lt;<span class="keyword">Class</span>&lt;?&gt;, Transformation&lt;?&gt;&gt; transformations,</span><br><span class="line">      <span class="keyword">Class</span>&lt;?&gt; resourceClass,</span><br><span class="line">      <span class="keyword">Class</span>&lt;?&gt; transcodeClass,</span><br><span class="line">      <span class="keyword">Options</span> <span class="keyword">options</span>) &#123;</span><br><span class="line">    <span class="keyword">this</span>.model = Preconditions.checkNotNull(model);</span><br><span class="line">    <span class="keyword">this</span>.signature = Preconditions.checkNotNull(signature, <span class="string">"Signature must not be null"</span>);</span><br><span class="line">    <span class="keyword">this</span>.width = width;</span><br><span class="line">    <span class="keyword">this</span>.height = height;</span><br><span class="line">    <span class="keyword">this</span>.transformations = Preconditions.checkNotNull(transformations);</span><br><span class="line">    <span class="keyword">this</span>.resourceClass =</span><br><span class="line">        Preconditions.checkNotNull(resourceClass, <span class="string">"Resource class must not be null"</span>);</span><br><span class="line">    <span class="keyword">this</span>.transcodeClass =</span><br><span class="line">        Preconditions.checkNotNull(transcodeClass, <span class="string">"Transcode class must not be null"</span>);</span><br><span class="line">    <span class="keyword">this</span>.<span class="keyword">options</span> = Preconditions.checkNotNull(<span class="keyword">options</span>);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  @Override</span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">boolean</span> equals(Object o) &#123;</span><br><span class="line">    <span class="keyword">if</span> (o <span class="keyword">instanceof</span> EngineKey) &#123;</span><br><span class="line">      EngineKey other = (EngineKey) o;</span><br><span class="line">      <span class="keyword">return</span> model.equals(other.model)</span><br><span class="line">          &amp;&amp; signature.equals(other.signature)</span><br><span class="line">          &amp;&amp; height == other.height</span><br><span class="line">          &amp;&amp; width == other.width</span><br><span class="line">          &amp;&amp; transformations.equals(other.transformations)</span><br><span class="line">          &amp;&amp; resourceClass.equals(other.resourceClass)</span><br><span class="line">          &amp;&amp; transcodeClass.equals(other.transcodeClass)</span><br><span class="line">          &amp;&amp; <span class="keyword">options</span>.equals(other.<span class="keyword">options</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  @Override</span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">int</span> hashCode() &#123;</span><br><span class="line">    <span class="keyword">if</span> (hashCode == <span class="number">0</span>) &#123;</span><br><span class="line">      hashCode = model.hashCode();</span><br><span class="line">      hashCode = <span class="number">31</span> * hashCode + signature.hashCode();</span><br><span class="line">      hashCode = <span class="number">31</span> * hashCode + width;</span><br><span class="line">      hashCode = <span class="number">31</span> * hashCode + height;</span><br><span class="line">      hashCode = <span class="number">31</span> * hashCode + transformations.hashCode();</span><br><span class="line">      hashCode = <span class="number">31</span> * hashCode + resourceClass.hashCode();</span><br><span class="line">      hashCode = <span class="number">31</span> * hashCode + transcodeClass.hashCode();</span><br><span class="line">      hashCode = <span class="number">31</span> * hashCode + <span class="keyword">options</span>.hashCode();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> hashCode;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>由以上源码我们知道，通过EngineKeyFactory的buildKey方法Glide创建了缓存的Key实现类EngineKey对象，由生成EngineKey对象传入的参数我们可以明白，只要有一个参数不同，所生成的EngineKey对象都会是不同的。内存的速度是最快的，理所当然如果内存中有缓存的对应加载图片Glide会搜先从内存缓存中加载。</p>
+<h3 id="LRU"><a href="#LRU" class="headerlink" title="LRU"></a>LRU</h3></li>
+<li>Glide<a href="https://bumptech.github.io/glide/doc/caching.html" target="_blank" rel="noopener">官方文档</a>说明<br><img src="https://github.com/maoqitian/MaoMdPhoto/raw/39c2ad856ab065e47c96d50f8e28cd151c142750/%E4%BB%8E%E6%BA%90%E7%A0%81%E8%A7%92%E5%BA%A6%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Glide/%E8%B5%84%E6%BA%90%E7%AE%A1%E7%90%86%E6%8F%8F%E8%BF%B0.png" alt="资源管理官方描述"><h4 id="LRU算法思想"><a href="#LRU算法思想" class="headerlink" title="LRU算法思想"></a>LRU算法思想</h4></li>
+<li>从官方文档描述，我们可以知道Glide的缓存底层实现原理算法都是LRU（Least Recently Used），字面意思为最近最少使用。算法核心思想（个人理解）：<strong>在一个有限的集合中，存入缓存，每一个缓存都有唯一标识，当要获取一个缓存，集合中没有则存入，有则直接从集合获取，存入缓存到集合时如果集合已经满了则找到集合中最近最少的缓存删除并存入需要存入的缓存。</strong> 这样也就有效的避免了内存溢出（OOM）的问题。</li>
+<li>接下来我们看一张图能够更好的理解LRU算法</li>
+</ul>
+<p><img src="https://github.com/maoqitian/MaoMdPhoto/raw/master/%E4%BB%8E%E6%BA%90%E7%A0%81%E8%A7%92%E5%BA%A6%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Glide/LRU%E5%9B%BE.jpg" alt="LRU图"></p>
+<ul>
+<li>横线上方每个数字代表要存入的数据，横线下方代表三个内存页（也可以理解为缓存结合），缓存集合最多可以存入三个缓存数据，则从1开始依次按照数字代码的缓存读取并存入缓存集合，首先开始时三个页内存是空的，前三个缓存数据不同，依次存入缓存集合，当数字4在内存中并进行缓存时，根据LRU算法思想，则2和3相较于1使用时间间隔更少，所以淘汰1，缓存数据4替换1的位置，接下去同理。</li>
+<li>Glide内存缓存使用的是LruCache，磁盘缓存使用的DiskLruCache，他们核心思想都是LRU算法，而缓存集合使用的是LinkedHashMap，熟悉<a href="https://www.jianshu.com/p/972dfad0c95b" target="_blank" rel="noopener">集合框架</a>应该都明白LinkedHashMap集成HashMap，并且LinkedHashMap保证了key的唯一性，更符合LRU算法的实现。</li>
+<li>更深入的了解LruCache和DiskLruCache可以查看郭霖大神的解析<a href="https://blog.csdn.net/guolin_blog/article/details/28863651" target="_blank" rel="noopener">Android DiskLruCache完全解析，硬盘缓存的最佳方案</a><h3 id="内存缓存"><a href="#内存缓存" class="headerlink" title="内存缓存"></a>内存缓存</h3><h4 id="内存缓存相关API"><a href="#内存缓存相关API" class="headerlink" title="内存缓存相关API"></a>内存缓存相关API</h4><figure class="highlight pony"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//跳过内存缓存</span></span><br><span class="line"><span class="type">RequestOptions</span> requestOptions =<span class="function"><span class="keyword">new</span> <span class="title">RequestOptions</span>().<span class="title">skipMemoryCache</span>(true);</span></span><br><span class="line"><span class="function"><span class="title">Glide</span>.<span class="title">with</span>(this).<span class="title">load</span>(<span class="type">IMAGE_URL</span>).<span class="title">apply</span>(requestOptions).<span class="title">into</span>(imageView);</span></span><br><span class="line"><span class="function"><span class="comment">//Generated API 方式</span></span></span><br><span class="line"><span class="function"><span class="title">GlideApp</span>.<span class="title">with</span>(this).<span class="title">load</span>(<span class="type">IMAGE_URL</span>).<span class="title">skipMemoryCache</span>(true).<span class="title">into</span>(imageView); </span></span><br><span class="line"><span class="function"><span class="comment">//清除内存缓存，必须在主线程中调用</span></span></span><br><span class="line"><span class="function"><span class="title">Glide</span>.<span class="title">get</span>(context).<span class="title">clearMemory</span>();</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h4 id="内存缓存源码分析"><a href="#内存缓存源码分析" class="headerlink" title="内存缓存源码分析"></a>内存缓存源码分析</h4><ul>
+<li>内存缓存不需要你进行任何设置，它默认就是开启的，我们再次回到Engine类的load方法<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**Engine类的load方法*/</span></span><br><span class="line"><span class="keyword">public</span> &lt;R&gt; LoadStatus load(GlideContext glideContext,Object model, Key signature,<span class="keyword">int</span> width,<span class="keyword">int</span> height,<span class="keyword">Class</span>&lt;?&gt; resourceClass,<span class="keyword">Class</span>&lt;R&gt; transcodeClass,Priority priority,DiskCacheStrategy diskCacheStrategy,Map&lt;<span class="keyword">Class</span>&lt;?&gt;, Transformation&lt;?&gt;&gt; transformations,<span class="keyword">boolean</span> isTransformationRequired,<span class="keyword">boolean</span> isScaleOnlyOrNoTransform, <span class="keyword">Options</span> <span class="keyword">options</span>,<span class="keyword">boolean</span> isMemoryCacheable,<span class="keyword">boolean</span> useUnlimitedSourceExecutorPool,<span class="keyword">boolean</span> useAnimationPool,<span class="keyword">boolean</span> onlyRetrieveFromCache,ResourceCallback cb) &#123;</span><br><span class="line">    <span class="comment">//省略部分代码</span></span><br><span class="line">    ..........</span><br><span class="line">    EngineResource&lt;?&gt; active = loadFromActiveResources(key, isMemoryCacheable);</span><br><span class="line">    <span class="keyword">if</span> (active != <span class="keyword">null</span>) &#123;</span><br><span class="line">      cb.onResourceReady(active, DataSource.MEMORY_CACHE);</span><br><span class="line">      <span class="keyword">if</span> (VERBOSE_IS_LOGGABLE) &#123;</span><br><span class="line">        logWithTimeAndKey(<span class="string">"Loaded resource from active resources"</span>, startTime, key);</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//省略部分代码</span></span><br><span class="line">    ..........</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h5 id="活动资源-Active-Resources"><a href="#活动资源-Active-Resources" class="headerlink" title="活动资源 (Active Resources)"></a>活动资源 (Active Resources)</h5><ul>
+<li><p>通过以上Engine类load的源码，首先调用loadFromActiveResources方法来从内存中获取缓存</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> <span class="type">ActiveResources</span> activeResources;</span><br><span class="line"><span class="comment">/**Engine类的loadFromActiveResources方法*/</span></span><br><span class="line"><span class="meta">@Nullable</span></span><br><span class="line">  <span class="keyword">private</span> <span class="type">EngineResource</span>&lt;?&gt; loadFromActiveResources(<span class="type">Key</span> key, boolean isMemoryCacheable) &#123;</span><br><span class="line">    <span class="keyword">if</span> (!isMemoryCacheable) &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="type">EngineResource</span>&lt;?&gt; active = activeResources.get(key);</span><br><span class="line">    <span class="keyword">if</span> (active != <span class="literal">null</span>) &#123;</span><br><span class="line">      active.acquire();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> active;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="comment">/**ActiveResources类*/</span></span><br><span class="line"><span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">ActiveResources</span> </span>&#123;</span><br><span class="line">     <span class="meta">@VisibleForTesting</span></span><br><span class="line">  <span class="keyword">final</span> <span class="type">Map</span>&lt;<span class="type">Key</span>, <span class="type">ResourceWeakReference</span>&gt; activeEngineResources = <span class="keyword">new</span> <span class="type">HashMap</span>&lt;&gt;();</span><br><span class="line">   <span class="comment">//省略部分代码</span></span><br><span class="line">    ........</span><br><span class="line">   <span class="meta">@VisibleForTesting</span></span><br><span class="line">  static <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">ResourceWeakReference</span> <span class="keyword">extends</span> <span class="title">WeakReference&lt;EngineResource&lt;?&gt;&gt;</span> </span>&#123;</span><br><span class="line">    <span class="comment">//省略部分代码</span></span><br><span class="line">    ........</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/**Engine类的onEngineJobComplete方法*/</span></span><br><span class="line"><span class="meta">@SuppressWarnings</span>(<span class="string">"unchecked"</span>)</span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  public void onEngineJobComplete(<span class="type">EngineJob</span>&lt;?&gt; engineJob, <span class="type">Key</span> key, <span class="type">EngineResource</span>&lt;?&gt; resource) &#123;</span><br><span class="line">    <span class="type">Util</span>.assertMainThread();</span><br><span class="line">    <span class="comment">// A null resource indicates that the load failed, usually due to an exception.</span></span><br><span class="line">    <span class="keyword">if</span> (resource != <span class="literal">null</span>) &#123;</span><br><span class="line">      resource.setResourceListener(key, <span class="keyword">this</span>);</span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span> (resource.isCacheable()) &#123;</span><br><span class="line">        activeResources.activate(key, resource);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    jobs.removeIfCurrent(key, engineJob);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**RequestOptions类的skipMemoryCache方法*/</span></span><br><span class="line">public <span class="type">RequestOptions</span> skipMemoryCache(boolean skip) &#123;</span><br><span class="line">    <span class="keyword">if</span> (isAutoCloneEnabled) &#123;</span><br><span class="line">      <span class="keyword">return</span> clone().skipMemoryCache(<span class="literal">true</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">this</span>.isCacheable = !skip;</span><br><span class="line">    fields |= <span class="type">IS_CACHEABLE</span>;</span><br><span class="line">    <span class="keyword">return</span> selfOrThrowIfLocked();</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>通过以上源码， 这里需要分几步来解读，首先如果是第一次加载，肯定没有内存缓存，所以如果第一次加载成功，则在加载成功之后调用了Engine对象的onEngineJobComplete方法，并在该方法中将加载成功的resource通过ActiveResources对象的activate方法保存在其内部维护的弱引用（WeakReference）HashMap中。下次再加载相同的资源，当你设置了skipMemoryCache（true），则表明你不想使用内存缓存，这时候Glide再次加载相同资源的时候则会跳过内存缓存的加载，否则可以从ActiveResources对象中获取，如果内存资源没被回收的话（关于弱引用的一下描述可以看看我以前写的一篇文章<a href="https://www.jianshu.com/p/bfc3e8cd64ae" target="_blank" rel="noopener">Android 学习笔记之图片三级缓存</a>）。如果该弱引用资源被回收了(GC)，则下一步就到内存中寻找是否有该资源的缓存。</p>
+</li>
+</ul>
+<h5 id="内存缓存-Memory-cache"><a href="#内存缓存-Memory-cache" class="headerlink" title="内存缓存 (Memory cache)"></a>内存缓存 (Memory cache)</h5><ul>
+<li><p>接着回到Engine类的load方法，如果弱引用缓存资源已经被回收，则调用loadFromCache方法在内存缓存中查找缓存资源</p>
+<figure class="highlight processing"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**Engine类的load方法*/</span></span><br><span class="line"><span class="keyword">public</span> &lt;R&gt; LoadStatus load(GlideContext glideContext,<span class="keyword">Object</span> model, Key signature,<span class="built_in">int</span> <span class="built_in">width</span>,<span class="built_in">int</span> <span class="built_in">height</span>,Class&lt;?&gt; resourceClass,Class&lt;R&gt; transcodeClass,Priority priority,DiskCacheStrategy diskCacheStrategy,Map&lt;Class&lt;?&gt;, Transformation&lt;?&gt;&gt; transformations,<span class="built_in">boolean</span> isTransformationRequired,<span class="built_in">boolean</span> isScaleOnlyOrNoTransform, Options options,<span class="built_in">boolean</span> isMemoryCacheable,<span class="built_in">boolean</span> useUnlimitedSourceExecutorPool,<span class="built_in">boolean</span> useAnimationPool,<span class="built_in">boolean</span> onlyRetrieveFromCache,ResourceCallback cb) &#123;</span><br><span class="line">    <span class="comment">//省略部分代码</span></span><br><span class="line">    ..........</span><br><span class="line">    EngineResource&lt;?&gt; cached = loadFromCache(<span class="built_in">key</span>, isMemoryCacheable);</span><br><span class="line">    <span class="keyword">if</span> (cached != <span class="keyword">null</span>) &#123;</span><br><span class="line">      cb.onResourceReady(cached, DataSource.MEMORY_CACHE);</span><br><span class="line">      <span class="keyword">if</span> (VERBOSE_IS_LOGGABLE) &#123;</span><br><span class="line">        logWithTimeAndKey(<span class="string">"Loaded resource from cache"</span>, startTime, <span class="built_in">key</span>);</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//省略部分代码</span></span><br><span class="line">    ..........</span><br><span class="line">  &#125;</span><br><span class="line"><span class="comment">/**Engine类的loadFromCache方法*/</span></span><br><span class="line"><span class="keyword">private</span> EngineResource&lt;?&gt; loadFromCache(Key <span class="built_in">key</span>, <span class="built_in">boolean</span> isMemoryCacheable) &#123;</span><br><span class="line">    <span class="keyword">if</span> (!isMemoryCacheable) &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    EngineResource&lt;?&gt; cached = getEngineResourceFromCache(<span class="built_in">key</span>);</span><br><span class="line">    <span class="keyword">if</span> (cached != <span class="keyword">null</span>) &#123;</span><br><span class="line">      cached.acquire();</span><br><span class="line">      activeResources.activate(<span class="built_in">key</span>, cached);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> cached;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="comment">/**Engine类的getEngineResourceFromCache方法*/</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> MemoryCache cache;</span><br><span class="line"><span class="keyword">private</span> EngineResource&lt;?&gt; getEngineResourceFromCache(Key <span class="built_in">key</span>) &#123;</span><br><span class="line">    Resource&lt;?&gt; cached = cache.remove(<span class="built_in">key</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">final</span> EngineResource&lt;?&gt; result;</span><br><span class="line">    <span class="keyword">if</span> (cached == <span class="keyword">null</span>) &#123;</span><br><span class="line">      result = <span class="keyword">null</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (cached <span class="keyword">instanceof</span> EngineResource) &#123;</span><br><span class="line">      <span class="comment">// Save an object allocation if we've cached an EngineResource (the typical case).</span></span><br><span class="line">      result = (EngineResource&lt;?&gt;) cached;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      result = <span class="keyword">new</span> EngineResource&lt;&gt;(cached, <span class="keyword">true</span> <span class="comment">/*isMemoryCacheable*/</span>, <span class="keyword">true</span> <span class="comment">/*isRecyclable*/</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="comment">/**GlideBuilder类的build方法*/</span></span><br><span class="line"><span class="keyword">private</span>  MemoryCache cache;</span><br><span class="line">@NonNull</span><br><span class="line">  Glide build(@NonNull Context context) &#123;</span><br><span class="line">    <span class="comment">//省略部分代码</span></span><br><span class="line">    ..........</span><br><span class="line">    <span class="keyword">if</span> (memoryCache == <span class="keyword">null</span>) &#123;</span><br><span class="line">      memoryCache = <span class="keyword">new</span> LruResourceCache(memorySizeCalculator.getMemoryCacheSize());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (diskCacheFactory == <span class="keyword">null</span>) &#123;</span><br><span class="line">      diskCacheFactory = <span class="keyword">new</span> InternalCacheDiskCacheFactory(context);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (engine == <span class="keyword">null</span>) &#123;</span><br><span class="line">      engine =</span><br><span class="line">          <span class="keyword">new</span> Engine(</span><br><span class="line">              memoryCache,</span><br><span class="line">              diskCacheFactory,</span><br><span class="line">              diskCacheExecutor,</span><br><span class="line">              sourceExecutor,</span><br><span class="line">              GlideExecutor.newUnlimitedSourceExecutor(),</span><br><span class="line">              GlideExecutor.newAnimationExecutor(),</span><br><span class="line">              isActiveResourceRetentionAllowed);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//省略部分代码</span></span><br><span class="line">    ..........</span><br><span class="line">&#125;    </span><br><span class="line"><span class="comment">/**LruResourceCache类的实现继承关系*/</span>    </span><br><span class="line"><span class="keyword">public</span> class LruResourceCache extends LruCache&lt;Key, Resource&lt;?&gt;&gt; implements MemoryCache&#123;......&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>通过以上源码，在loadFromCache同样也判断了Glide是否设置了skipMemoryCache（true）方法，没有设置则调用getEngineResourceFromCache方法，在该方法中我们可以看到cache对象就是MemoryCache对象，而该对象实际是一个接口，他的实现类是LruResourceCache，该对象我们前面在GlideBuilder的build方法中进行了新建（在第一步with方法中调用了Glide.get方法，在get方法中初始化Glide调用了在GlideBuilder的build方法），这里也就说明Glide的内存缓存还是使用LruCache来实现，这里如果获取到了内存缓存，则获取内容缓存的同时移除该缓存，并在loadFromCache方法中将该资源标记为正在使用同时加入在弱引用中。这样在ListView或者Recyclerview中加载图片则下次加载首先从弱引用Map中获取缓存资源，并且标志当前资源正在使用，可以防止该资源被LRU算法回收掉。</p>
+<h5 id="内存缓存写入"><a href="#内存缓存写入" class="headerlink" title="内存缓存写入"></a>内存缓存写入</h5></li>
+<li><p>前面我们只是分析了如何获取内存缓存，而内存缓存又是在哪里写入的呢？根据前面分析，首先获取在弱引用Map中的缓存资源，而前面我们在分析活动资源(Active Resources)时候已经说过是在onEngineJobComplete放中往弱引用Map存放缓存资源，而<br>onEngineJobComplete方法是在哪里调用呢，这我们就要回想起<a href="https://www.maoqitian.com/2019/02/19/%E4%BB%8E%E6%BA%90%E7%A0%81%E8%A7%92%E5%BA%A6%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3glide%EF%BC%88%E4%B8%8A%EF%BC%89/">上一篇文章</a>中我们再网络加载图片成功后腰切换在主线程回调来显示图片，也就是EngineJob对象的handleResultOnMainThread方法</p>
+<figure class="highlight clean"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**EngineJob类的handleResultOnMainThread方法*/</span></span><br><span class="line">@Synthetic</span><br><span class="line">  void handleResultOnMainThread() &#123;</span><br><span class="line">    <span class="comment">//省略部分代码</span></span><br><span class="line">    ..........</span><br><span class="line">    engineResource = engineResourceFactory.build(resource, isCacheable);</span><br><span class="line">    hasResource = true;</span><br><span class="line">    <span class="comment">//省略部分代码</span></span><br><span class="line">    ..........</span><br><span class="line">    engineResource.acquire();</span><br><span class="line">    listener.onEngineJobComplete(this, key, engineResource);</span><br><span class="line">    engineResource.release();</span><br><span class="line">    <span class="comment">//省略部分代码</span></span><br><span class="line">    ..........</span><br><span class="line">  &#125;</span><br><span class="line"><span class="comment">/**EngineJob类的EngineResourceFactory内部类*/</span>  </span><br><span class="line">@VisibleForTesting</span><br><span class="line">  static <span class="keyword">class</span> EngineResourceFactory &#123;</span><br><span class="line">    public &lt;R&gt; EngineResource&lt;R&gt; build(Resource&lt;R&gt; resource, boolean isMemoryCacheable) &#123;</span><br><span class="line">      return new EngineResource&lt;&gt;(resource, isMemoryCacheable, <span class="comment">/*isRecyclable=*/</span> true);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="comment">/**Engine类的onEngineJobComplete方法*/</span></span><br><span class="line">@SuppressWarnings(<span class="string">"unchecked"</span>)</span><br><span class="line">  @Override</span><br><span class="line">  public void onEngineJobComplete(EngineJob&lt;?&gt; engineJob, Key key, EngineResource&lt;?&gt; resource) &#123;</span><br><span class="line">    <span class="comment">//省略部分代码</span></span><br><span class="line">    ..........</span><br><span class="line">    <span class="keyword">if</span> (resource != null) &#123;</span><br><span class="line">      resource.setResourceListener(key, this);</span><br><span class="line">      <span class="keyword">if</span> (resource.isCacheable()) &#123;</span><br><span class="line">        activeResources.activate(key, resource);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//省略部分代码</span></span><br><span class="line">    ..........</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>通过以上源码，EngineJob类的handleResultOnMainThread方法首先构建了获取好的包含图片的资源，标记当前资源正在使用，通过listener.onEngineJobComplete回调，而listener就是Engine对象，也就到了Engine类的onEngineJobComplete方法，并在该方法中存入了图片资源到弱引用Map中。</p>
+</li>
+<li><p>上面我是分析了弱引用资源的缓存存入，接着我们看看内存缓存是在哪里存入的，在次看回handleResultOnMainThread方法，我们看到onEngineJobComplete回调前后分别调用了EngineResource对象的acquire方法和release方法</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**EngineResource类的acquire方法*/</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">acquire</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (isRecycled) &#123;</span><br><span class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"Cannot acquire a recycled resource"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (!Looper.getMainLooper().<span class="keyword">equals</span>(Looper.myLooper())) &#123;</span><br><span class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> IllegalThreadStateException(<span class="string">"Must call acquire on the main thread"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    ++acquired;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="comment">/**EngineResource类的release方法*/</span></span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">release</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (acquired &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"Cannot release a recycled or not yet acquired resource"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (!Looper.getMainLooper().<span class="keyword">equals</span>(Looper.myLooper())) &#123;</span><br><span class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> IllegalThreadStateException(<span class="string">"Must call release on the main thread"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (--acquired == <span class="number">0</span>) &#123;</span><br><span class="line">      listener.onResourceReleased(key, <span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="comment">/**Engine类的onResourceReleased方法*/</span></span><br><span class="line">@Override</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onResourceReleased</span>(<span class="params">Key cacheKey, EngineResource&lt;?&gt; resource</span>)</span> &#123;</span><br><span class="line">    Util.assertMainThread();</span><br><span class="line">    activeResources.deactivate(cacheKey);</span><br><span class="line">    <span class="keyword">if</span> (resource.isCacheable()) &#123;</span><br><span class="line">      cache.put(cacheKey, resource);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      resourceRecycler.recycle(resource);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>通过以上源码，其实我们应该能恍然大悟，Glide的内存缓存存入其实就是通过一个acquired变量来进行控制，如果当前弱引用资源不再使用，也就是acquired等于零的时候，则调用回调listener.onResourceReleased（listener就是Engine对象），在onResourceReleased方法中移除了弱引用资源资源，并且没有设置skipMemoryCache（true），则通过cache.put存入内存缓存。</p>
+</li>
+<li>总的来说Glide的内存缓存主要是结合了弱引用和内存来实现的。<h5 id="Glide内存缓存机制示意图"><a href="#Glide内存缓存机制示意图" class="headerlink" title="Glide内存缓存机制示意图"></a>Glide内存缓存机制示意图</h5><img src="https://github.com/maoqitian/MaoMdPhoto/raw/master/%E4%BB%8E%E6%BA%90%E7%A0%81%E8%A7%92%E5%BA%A6%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Glide/Glide%E5%86%85%E5%AD%98%E7%BC%93%E5%AD%98%E6%9C%BA%E5%88%B6%E7%A4%BA%E6%84%8F%E5%9B%BE.jpg" alt="Glide内存缓存机制示意图"><h3 id="磁盘缓存"><a href="#磁盘缓存" class="headerlink" title="磁盘缓存"></a>磁盘缓存</h3></li>
+<li><p>说去磁盘缓存，上一篇文章我们在简单使用Glide的例子中就已经使用了Glide的磁盘缓存</p>
+<figure class="highlight pony"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">RequestOptions</span> requestOptions = <span class="function"><span class="keyword">new</span> <span class="title">RequestOptions</span>()</span></span><br><span class="line"><span class="function">         .<span class="title">diskCacheStrategy</span>(<span class="type">DiskCacheStrategy</span>.<span class="type">NONE</span>);<span class="comment">//不使用缓存</span></span></span><br><span class="line"><span class="function">     <span class="title">Glide</span>.<span class="title">with</span>(<span class="type">Context</span>).<span class="title">load</span>(<span class="type">IMAGE_URL</span>).<span class="title">apply</span>(requestOptions).<span class="title">into</span>(mImageView);</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>既然知道如何使用Glide的磁盘缓存，首先我们要了解Glide4中给我提供了哪几种磁盘缓存策略</p>
+<h4 id="磁盘缓存策略"><a href="#磁盘缓存策略" class="headerlink" title="磁盘缓存策略"></a>磁盘缓存策略</h4></li>
+<li>1.DiskCacheStrategy.NONE： 表示不使用磁盘缓存</li>
+<li>2.DiskCacheStrategy.DATA： 表示磁盘缓存只缓存原始加载的图片</li>
+<li>DiskCacheStrategy.RESOURCE： 表示磁盘缓存只缓存经过解码转换后的图片</li>
+<li>DiskCacheStrategy.ALL： 表示磁盘缓存既缓存原始图片，也缓存经过解码转换后的图片</li>
+<li>DiskCacheStrategy.AUTOMATIC： 表示让Glide根据图片资源智能地选择使用哪一种磁盘缓存策略，该选项也是我们在不进行手动设置的时候Glide的默认设置<h4 id="磁盘缓存源码分析"><a href="#磁盘缓存源码分析" class="headerlink" title="磁盘缓存源码分析"></a>磁盘缓存源码分析</h4></li>
+<li><p>不知你是否还记得上一篇文章中在加载图片的时候我们是在开启子线程任务在线程池中进行的，我们来回顾一下</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**DecodeJob类的start方法*/</span></span><br><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">void</span> <span class="title">start</span><span class="params">(DecodeJob&lt;R&gt; decodeJob)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.decodeJob = decodeJob;</span><br><span class="line">    GlideExecutor executor = decodeJob.willDecodeFromCache()</span><br><span class="line">        ? diskCacheExecutor</span><br><span class="line">        : getActiveSourceExecutor();</span><br><span class="line">    executor.execute(decodeJob);</span><br><span class="line">  &#125;</span><br><span class="line"><span class="comment">/**DecodeJob类的willDecodeFromCache方法*/</span> </span><br><span class="line"> <span class="function"><span class="keyword">boolean</span> <span class="title">willDecodeFromCache</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Stage firstStage = getNextStage(Stage.INITIALIZE);</span><br><span class="line">    <span class="keyword">return</span> firstStage == Stage.RESOURCE_CACHE || firstStage == Stage.DATA_CACHE;</span><br><span class="line">  &#125; </span><br><span class="line"><span class="comment">/**DecodeJob类的getNextStage方法*/</span>   </span><br><span class="line"><span class="keyword">private</span> <span class="function">Stage <span class="title">getNextStage</span><span class="params">(Stage current)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">switch</span> (current) &#123;</span><br><span class="line">      <span class="keyword">case</span> INITIALIZE:</span><br><span class="line">        <span class="keyword">return</span> diskCacheStrategy.decodeCachedResource()</span><br><span class="line">            ? Stage.RESOURCE_CACHE : getNextStage(Stage.RESOURCE_CACHE);</span><br><span class="line">      <span class="keyword">case</span> RESOURCE_CACHE:</span><br><span class="line">        <span class="keyword">return</span> diskCacheStrategy.decodeCachedData()</span><br><span class="line">            ? Stage.DATA_CACHE : getNextStage(Stage.DATA_CACHE);</span><br><span class="line">      <span class="keyword">case</span> DATA_CACHE:</span><br><span class="line">        <span class="keyword">return</span> onlyRetrieveFromCache ? Stage.FINISHED : Stage.SOURCE;</span><br><span class="line">     <span class="comment">//省略部分代码</span></span><br><span class="line">    ......</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="comment">/**DiskCacheStrategy类的ALL对象*/</span>     </span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> DiskCacheStrategy ALL = <span class="keyword">new</span> DiskCacheStrategy() &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">boolean</span> <span class="title">isDataCacheable</span><span class="params">(DataSource dataSource)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> dataSource == DataSource.REMOTE;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">boolean</span> isResourceCacheable(<span class="keyword">boolean</span> isFromAlternateCacheKey, DataSource dataSource,</span><br><span class="line">        EncodeStrategy encodeStrategy) &#123;</span><br><span class="line">      <span class="keyword">return</span> dataSource != DataSource.RESOURCE_DISK_CACHE &amp;&amp; dataSource != DataSource.MEMORY_CACHE;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">boolean</span> <span class="title">decodeCachedResource</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">boolean</span> <span class="title">decodeCachedData</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;;  </span><br><span class="line"><span class="comment">/**GlideBuilder类的build方法*/</span>  </span><br><span class="line"><span class="meta">@NonNull</span></span><br><span class="line">  <span class="function">Glide <span class="title">build</span><span class="params">(@NonNull Context context)</span> </span>&#123;</span><br><span class="line">    <span class="comment">//省略部分代码</span></span><br><span class="line">    ......</span><br><span class="line">    <span class="keyword">if</span> (diskCacheExecutor == <span class="keyword">null</span>) &#123;</span><br><span class="line">      diskCacheExecutor = GlideExecutor.newDiskCacheExecutor();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//省略部分代码</span></span><br><span class="line">    ......</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/**GlideExecutor类的newDiskCacheExecutor方法*/</span> </span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> DEFAULT_DISK_CACHE_EXECUTOR_THREADS = <span class="number">1</span>;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="function">GlideExecutor <span class="title">newDiskCacheExecutor</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> newDiskCacheExecutor(</span><br><span class="line">        DEFAULT_DISK_CACHE_EXECUTOR_THREADS,</span><br><span class="line">        DEFAULT_DISK_CACHE_EXECUTOR_NAME,</span><br><span class="line">        UncaughtThrowableStrategy.DEFAULT);</span><br><span class="line">  &#125;</span><br><span class="line"><span class="comment">/**GlideExecutor类的newDiskCacheExecutor方法*/</span> </span><br><span class="line"> <span class="keyword">public</span> <span class="keyword">static</span> GlideExecutor newDiskCacheExecutor(</span><br><span class="line">      <span class="keyword">int</span> threadCount, String name, UncaughtThrowableStrategy uncaughtThrowableStrategy) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> GlideExecutor(</span><br><span class="line">        <span class="keyword">new</span> ThreadPoolExecutor(</span><br><span class="line">            threadCount <span class="comment">/* corePoolSize */</span>,</span><br><span class="line">            threadCount <span class="comment">/* maximumPoolSize */</span>,</span><br><span class="line">            <span class="number">0</span> <span class="comment">/* keepAliveTime */</span>,</span><br><span class="line">            TimeUnit.MILLISECONDS,</span><br><span class="line">            <span class="keyword">new</span> PriorityBlockingQueue&lt;Runnable&gt;(),</span><br><span class="line">            <span class="keyword">new</span> DefaultThreadFactory(name, uncaughtThrowableStrategy, <span class="keyword">true</span>)));</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>通过以上源码，可以分两个步骤来进行解读：</p>
+<ul>
+<li>第一步在DecodeJob对象的start方法开启子线程来加载图片，这里使用了线程池，通过willDecodeFromCache方法和getNextStage放结合，主要通过Stage枚举来判断当前使用的缓存策略，而缓存策略的设置则通过DiskCacheStrategy对象的<strong>decodeCachedResource和decodeCachedData方法来进行设置</strong>，而这两个方法在DiskCacheStrategy抽象类都是抽象方法，而他们的实现就是我们前面提到的Glide磁盘缓存的五种策略，上面代码中列出其中一种ALL代码，decodeCachedResource和decodeCachedData方法都返回ture，也就说明磁盘缓存既缓存原始图片，也缓存经过解码转换后的图片；如果decodeCachedResource返回false和decodeCachedData方法返回true，也就代表DATA策略，磁盘缓存只缓存原始加载的图片，其他同理</li>
+<li>第二步通过前面对设置策略的判断，如果有缓存策略，则拿到的线程池就是磁盘缓存加载的线程池（线程池的理解可以看看我以前写的一篇<a href="https://www.maoqitian.com/2019/01/20/Java中的线程池/">文章</a>），该线程的初始化还是在GlideExecutor对象的build方法中，通过以上源码，该线程池只有唯一一个核心线程，这就保证所有执行的的任务都在这一个线程中执行，并且是顺序执行，也就不用在考虑线程同步的问题了。</li>
+</ul>
+</li>
+<li>根据前面官网的说明，不管是内存缓存还是磁盘缓存，都是使用LRU，接着看看Glide磁盘缓存在哪获取LRU对象，还是得看到GlideBuilder对象的build方法</li>
+</ul>
+<figure class="highlight clean"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**GlideBuilder类的build方法*/</span>  </span><br><span class="line">private DiskCache.Factory diskCacheFactory;</span><br><span class="line">@NonNull</span><br><span class="line">  Glide build(@NonNull Context context) &#123;</span><br><span class="line">    <span class="comment">//省略部分代码</span></span><br><span class="line">    ..........</span><br><span class="line">    <span class="keyword">if</span> (diskCacheFactory == null) &#123;</span><br><span class="line">      diskCacheFactory = new InternalCacheDiskCacheFactory(context);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//省略部分代码</span></span><br><span class="line">    ..........</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/**InternalCacheDiskCacheFactory类的继承关系*/</span></span><br><span class="line">public final <span class="keyword">class</span> InternalCacheDiskCacheFactory extends DiskLruCacheFactory &#123;</span><br><span class="line">   <span class="comment">//省略实现代码</span></span><br><span class="line">    ..........  </span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/**DiskLruCacheFactory类的部分代码*/</span></span><br><span class="line">public <span class="keyword">class</span> DiskLruCacheFactory implements DiskCache.Factory &#123;</span><br><span class="line">   <span class="comment">//省略部分代码</span></span><br><span class="line">    ..........</span><br><span class="line">    @Override</span><br><span class="line">  public DiskCache build() &#123;</span><br><span class="line">    File cacheDir = cacheDirectoryGetter.getCacheDirectory();</span><br><span class="line">    <span class="comment">//省略部分代码</span></span><br><span class="line">    ..........</span><br><span class="line">    return DiskLruCacheWrapper.create(cacheDir, diskCacheSize);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/**DiskLruCacheWrapper类的部分代码*/</span></span><br><span class="line">public <span class="keyword">class</span> DiskLruCacheWrapper implements DiskCache &#123;</span><br><span class="line"><span class="comment">//省略部分代码</span></span><br><span class="line">    ..........</span><br><span class="line">   private synchronized DiskLruCache getDiskCache() throws IOException &#123;</span><br><span class="line">    <span class="keyword">if</span> (diskLruCache == null) &#123;</span><br><span class="line">      diskLruCache = DiskLruCache.open(directory, APP_VERSION, VALUE_COUNT, maxSize);</span><br><span class="line">    &#125;</span><br><span class="line">    return diskLruCache;</span><br><span class="line">  &#125; </span><br><span class="line">  <span class="comment">//省略部分代码</span></span><br><span class="line">    ..........</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/**DiskLruCache类的部分代码*/</span></span><br><span class="line">public final <span class="keyword">class</span> DiskLruCache implements Closeable &#123;</span><br><span class="line">    <span class="comment">//省略部分代码</span></span><br><span class="line">    ..........</span><br><span class="line">    public static DiskLruCache open(File directory, int appVersion, int valueCount, long maxSize)</span><br><span class="line">      throws IOException &#123;</span><br><span class="line">          DiskLruCache cache = new DiskLruCache(directory, appVersion, valueCount, maxSize);</span><br><span class="line">          <span class="comment">//省略部分代码</span></span><br><span class="line">          ..........</span><br><span class="line">          return cache;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="comment">//省略部分代码</span></span><br><span class="line">      ..........</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>通过以上源码，我们在GlideBuilder对象的build方法中已经新建了InternalCacheDiskCacheFactory对象，也就是DiskLruCacheFactory对象，同样该对象已经被我们传入Engine对象的构造方法中，最终包装成LazyDiskCacheProvider对象（该对象代码就不贴出了），所以只要调用DiskLruCacheFactory对象的build方法就能够最终获取到<strong>DiskLruCache对象</strong>，该对象是Glide自己实现的，但是其原理和谷歌官方推荐的DiskLruCache也差不了太多，核心还是使用LRU算法来实现磁盘缓存。<h5 id="资源类型（Resource）"><a href="#资源类型（Resource）" class="headerlink" title="资源类型（Resource）"></a>资源类型（Resource）</h5></li>
+<li><p>根据前面分分析，假定没有内存缓存，而是由磁盘缓存，则结合前面分析我们得到了磁盘缓存处理的线程池，也获得枚举Stage是RESOURCE_CACHE或DATA_CACHE，则在DecodeJob对象getNextGenerator方法，我们就能得到对应的Generator</p>
+<figure class="highlight haxe"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**DecodeJob的getNextGenerator方法*/</span></span><br><span class="line"><span class="keyword">private</span> DataFetcherGenerator getNextGenerator() &#123;</span><br><span class="line">    <span class="keyword">switch</span> (stage) &#123;</span><br><span class="line">      <span class="keyword">case</span> RESOURCE_CACHE:<span class="type"></span></span><br><span class="line"><span class="type">        return new ResourceCacheGenerator</span>(decodeHelper, <span class="built_in">this</span>);</span><br><span class="line">      <span class="keyword">case</span> DATA_CACHE:<span class="type"></span></span><br><span class="line"><span class="type">        return new DataCacheGenerator</span>(decodeHelper, <span class="built_in">this</span>);</span><br><span class="line">      <span class="keyword">case</span> SOURCE:<span class="type"></span></span><br><span class="line"><span class="type">        return new SourceGenerator</span>(decodeHelper, <span class="built_in">this</span>);</span><br><span class="line">      <span class="keyword">case</span> FINISHED:<span class="type"></span></span><br><span class="line"><span class="type">        return null</span>;</span><br><span class="line">      <span class="keyword">default</span>:<span class="type"></span></span><br><span class="line"><span class="type">        throw new IllegalStateException</span>(<span class="string">"Unrecognized stage: "</span> + stage);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>通过getNextGenerator方法的源码，如果之前设置磁盘缓存策略为DiskCacheStrategy.RESOURCE，则应该对应的就是枚举Stage.RESOURCE_CACHE，也就是说接下来使用的资源Generator是ResourceCacheGenerator，结合<a href="https://www.maoqitian.com/2019/02/19/%E4%BB%8E%E6%BA%90%E7%A0%81%E8%A7%92%E5%BA%A6%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3glide%EF%BC%88%E4%B8%8A%EF%BC%89/">上一篇文章</a>，我们分析网络加载流程是这里获取的是SourceGenerator，我们接着来看ResourceCacheGenerator的startNext()方法</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/** ResourceCacheGenerator类的startNext方法*/</span></span><br><span class="line">  <span class="meta">@SuppressWarnings</span>(<span class="string">"PMD.CollapsibleIfStatements"</span>)</span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="keyword">public</span> <span class="function"><span class="keyword">boolean</span> <span class="title">startNext</span><span class="params">()</span> </span>&#123;</span><br><span class="line">     <span class="comment">//省略部分代码</span></span><br><span class="line">      ..........</span><br><span class="line">      currentKey =</span><br><span class="line">          <span class="keyword">new</span> ResourceCacheKey(<span class="comment">// NOPMD AvoidInstantiatingObjectsInLoops</span></span><br><span class="line">              helper.getArrayPool(),</span><br><span class="line">              sourceId,</span><br><span class="line">              helper.getSignature(),</span><br><span class="line">              helper.getWidth(),</span><br><span class="line">              helper.getHeight(),</span><br><span class="line">              transformation,</span><br><span class="line">              resourceClass,</span><br><span class="line">              helper.getOptions());</span><br><span class="line">      cacheFile = helper.getDiskCache().get(currentKey);</span><br><span class="line">      <span class="keyword">if</span> (cacheFile != <span class="keyword">null</span>) &#123;</span><br><span class="line">        sourceKey = sourceId;</span><br><span class="line">        modelLoaders = helper.getModelLoaders(cacheFile);</span><br><span class="line">        modelLoaderIndex = <span class="number">0</span>;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    loadData = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">boolean</span> started = <span class="keyword">false</span>;</span><br><span class="line">    <span class="keyword">while</span> (!started &amp;&amp; hasNextModelLoader()) &#123;</span><br><span class="line">      ModelLoader&lt;File, ?&gt; modelLoader = modelLoaders.get(modelLoaderIndex++);</span><br><span class="line">      loadData = modelLoader.buildLoadData(cacheFile,</span><br><span class="line">          helper.getWidth(), helper.getHeight(), helper.getOptions());</span><br><span class="line">      <span class="keyword">if</span> (loadData != <span class="keyword">null</span> &amp;&amp; helper.hasLoadPath(loadData.fetcher.getDataClass())) &#123;</span><br><span class="line">        started = <span class="keyword">true</span>;</span><br><span class="line">        loadData.fetcher.loadData(helper.getPriority(), <span class="keyword">this</span>);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> started;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="comment">/**DecodeHelper类的getDiskCache方法*/</span></span><br><span class="line"> <span class="function">DiskCache <span class="title">getDiskCache</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">return</span> diskCacheProvider.<span class="title">getDiskCache</span><span class="params">()</span></span>;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="comment">/** LazyDiskCacheProvider类的getDiskCache方法 */</span></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function">DiskCache <span class="title">getDiskCache</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      <span class="keyword">if</span> (diskCache == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">synchronized</span> (<span class="keyword">this</span>) &#123;</span><br><span class="line">          <span class="keyword">if</span> (diskCache == <span class="keyword">null</span>) &#123;</span><br><span class="line">            diskCache = factory.build();</span><br><span class="line">          &#125;</span><br><span class="line">          <span class="keyword">if</span> (diskCache == <span class="keyword">null</span>) &#123;</span><br><span class="line">            diskCache = <span class="keyword">new</span> DiskCacheAdapter();</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">return</span> diskCache;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>通过以上源码其实已经很清晰，首先还是获取缓存的唯一key，然后helper.getDiskCache().get(currentKey)这一句话就是获取缓存，helper对象就是DecodeHelper，它的getDiskCache方法获取的对象也就是前面提到的包含DiskLruCacheFactory对象的LazyDiskCacheProvider对象，而LazyDiskCacheProvider对象的getDiskCache方法调用了factory.build()，factory对象DiskLruCacheFactory，也就是获取了我们前面所说的<strong>DiskLruCache对象</strong>。</p>
+</li>
+<li>接着继续看数据返回走的流程还是通过回调通cb.onDataFetcherReady将获取的缓存资源传递到DecodeJob，由DecodeJob继续执行剩余图片显示步骤，大致流程和网络加载差不多，这里就不进行讨论了<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/** ResourceCacheGenerator类的startNext方法*/</span></span><br><span class="line"> @<span class="keyword">Override</span></span><br><span class="line">  public void onDataReady(Object data) &#123;</span><br><span class="line">    <span class="selector-tag">cb</span><span class="selector-class">.onDataFetcherReady</span>(<span class="selector-tag">sourceKey</span>, <span class="selector-tag">data</span>, <span class="selector-tag">loadData</span><span class="selector-class">.fetcher</span>, <span class="selector-tag">DataSource</span><span class="selector-class">.RESOURCE_DISK_CACHE</span>,</span><br><span class="line">        <span class="selector-tag">currentKey</span>);</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h5 id="数据来源-Data"><a href="#数据来源-Data" class="headerlink" title="数据来源 (Data)"></a>数据来源 (Data)</h5><ul>
+<li>同理资源类型（Resource），则设置磁盘缓存策略为DiskCacheStrategy.DATA，则应该对应的就是枚举Stage.DATA_CACHE，使用的资源Generator是DataCacheGenerator，所以直接看看DataCacheGenerator的startNext()方法，该方法源码如下，同样是根据key通过<strong>DiskLruCache对象</strong>来获取磁盘缓存（DATA），数据返回走的流程还是通过回调通cb.onDataFetcherReady将获取的缓存资源传递到DecodeJob，由DecodeJob继续执行剩余图片显示<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/** DataCacheGenerator类的startNext方法*/</span></span><br><span class="line"> <span class="meta">@Override</span></span><br><span class="line">  <span class="keyword">public</span> boolean startNext() &#123;</span><br><span class="line">      <span class="comment">//省略部分代码</span></span><br><span class="line">      ..........</span><br><span class="line">      Key originalKey = new DataCacheKey(sourceId, helper.getSignature());</span><br><span class="line">      cacheFile = helper.getDiskCache().<span class="keyword">get</span>(originalKey);</span><br><span class="line">      <span class="keyword">if</span> (cacheFile != <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="keyword">this</span>.sourceKey = sourceId;</span><br><span class="line">        modelLoaders = helper.getModelLoaders(cacheFile);</span><br><span class="line">        modelLoaderIndex = <span class="number">0</span>;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    loadData = <span class="literal">null</span>;</span><br><span class="line">    boolean started = <span class="literal">false</span>;</span><br><span class="line">    <span class="keyword">while</span> (!started &amp;&amp; hasNextModelLoader()) &#123;</span><br><span class="line">      ModelLoader&lt;File, ?&gt; modelLoader = modelLoaders.<span class="keyword">get</span>(modelLoaderIndex++);</span><br><span class="line">      loadData =</span><br><span class="line">          modelLoader.buildLoadData(cacheFile, helper.getWidth(), helper.getHeight(),</span><br><span class="line">              helper.getOptions());</span><br><span class="line">      <span class="keyword">if</span> (loadData != <span class="literal">null</span> &amp;&amp; helper.hasLoadPath(loadData.fetcher.getDataClass())) &#123;</span><br><span class="line">        started = <span class="literal">true</span>;</span><br><span class="line">        loadData.fetcher.loadData(helper.getPriority(), <span class="keyword">this</span>);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> started;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="comment">/** DataCacheGenerator类的onDataReady方法*/</span>  </span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line">  <span class="keyword">public</span> void onDataReady(Object <span class="keyword">data</span>) &#123;</span><br><span class="line">    cb.onDataFetcherReady(sourceKey, <span class="keyword">data</span>, loadData.fetcher, DataSource.DATA_DISK_CACHE, sourceKey);</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h5 id="磁盘缓存数据存入"><a href="#磁盘缓存数据存入" class="headerlink" title="磁盘缓存数据存入"></a>磁盘缓存数据存入</h5><ul>
+<li>前面我们只是了解了磁盘缓存的获取，磁盘缓存又是在哪里存入的，接着往下看。</li>
+<li><p>根据上一篇文章的分析，加载图片会走到DecodeJob对象的decodeFromRetrievedData方法</p>
+<figure class="highlight clean"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/** DecodeJob类的decodeFromRetrievedData方法*/</span>  </span><br><span class="line">private void decodeFromRetrievedData() &#123;</span><br><span class="line">    <span class="comment">//省略部分代码</span></span><br><span class="line">      ..........</span><br><span class="line">    notifyEncodeAndRelease(resource, currentDataSource);</span><br><span class="line">    <span class="comment">//省略部分代码</span></span><br><span class="line">      ..........</span><br><span class="line">&#125; </span><br><span class="line"><span class="comment">/** DecodeJob类的notifyEncodeAndRelease方法*/</span>  </span><br><span class="line">private final DeferredEncodeManager&lt;?&gt; deferredEncodeManager = new DeferredEncodeManager&lt;&gt;();</span><br><span class="line">private void notifyEncodeAndRelease(Resource&lt;R&gt; resource, DataSource dataSource) &#123;</span><br><span class="line"><span class="comment">//省略部分代码</span></span><br><span class="line">      ..........</span><br><span class="line">    stage = Stage.ENCODE;</span><br><span class="line">    try &#123;</span><br><span class="line">      <span class="keyword">if</span> (deferredEncodeManager.hasResourceToEncode()) &#123;</span><br><span class="line">        deferredEncodeManager.encode(diskCacheProvider, options);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125; </span><br><span class="line">    <span class="comment">//省略部分代码</span></span><br><span class="line">    ..........</span><br><span class="line">  &#125;</span><br><span class="line"><span class="comment">/** DeferredEncodeManager类的encode方法**/</span></span><br><span class="line">void encode(DiskCacheProvider diskCacheProvider, Options options) &#123;</span><br><span class="line">      GlideTrace.beginSection(<span class="string">"DecodeJob.encode"</span>);</span><br><span class="line">      try &#123;</span><br><span class="line">        diskCacheProvider.getDiskCache().put(key,</span><br><span class="line">            new DataCacheWriter&lt;&gt;(encoder, toEncode, options));</span><br><span class="line">      &#125; finally &#123;</span><br><span class="line">        toEncode.unlock();</span><br><span class="line">        GlideTrace.endSection();</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>通过以上源码可以看到DecodeJob对象的decodeFromRetrievedData方法通过调用notifyEncodeAndRelease方法，在该方法中调用了内部类DeferredEncodeManager的encode方法存入了磁盘缓存，这里存入的是转换后的磁盘缓存（Resource）。</p>
+</li>
+<li><p>原始数据也就是SourceGenerator第一次网络下载成功之后获取的图片数据，之后再做磁盘缓存，所以再次回到看到SourceGenerator的onDataReady方法</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**SourceGenerator类的onDataReady方法**/</span> </span><br><span class="line"><span class="keyword">private</span> <span class="built_in">Object</span> dataToCache;</span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line">  <span class="keyword">public</span> <span class="built_in">void</span> onDataReady(<span class="built_in">Object</span> data) &#123;</span><br><span class="line">    DiskCacheStrategy diskCacheStrategy = helper.getDiskCacheStrategy();</span><br><span class="line">    <span class="keyword">if</span> (data != <span class="literal">null</span> &amp;&amp; diskCacheStrategy.isDataCacheable(loadData.fetcher.getDataSource())) &#123;</span><br><span class="line">      dataToCache = data;</span><br><span class="line">      cb.reschedule();</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      cb.onDataFetcherReady(loadData.sourceKey, data, loadData.fetcher,</span><br><span class="line">          loadData.fetcher.getDataSource(), originalKey);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;  </span><br><span class="line"><span class="comment">/**SourceGenerator类的startNext方法**/</span></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line">  <span class="keyword">public</span> <span class="built_in">boolean</span> startNext() &#123;</span><br><span class="line">    <span class="keyword">if</span> (dataToCache != <span class="literal">null</span>) &#123;</span><br><span class="line">      <span class="built_in">Object</span> data = dataToCache;</span><br><span class="line">      dataToCache = <span class="literal">null</span>;</span><br><span class="line">      cacheData(data);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (sourceCacheGenerator != <span class="literal">null</span> &amp;&amp; sourceCacheGenerator.startNext()) &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">   <span class="comment">//省略部分代码</span></span><br><span class="line">  ..........</span><br><span class="line">  &#125;</span><br><span class="line"><span class="comment">/**SourceGenerator类的cacheData方法**/</span>  </span><br><span class="line"><span class="keyword">private</span> <span class="built_in">void</span> cacheData(<span class="built_in">Object</span> dataToCache) &#123;</span><br><span class="line">    long startTime = LogTime.getLogTime();</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      Encoder&lt;<span class="built_in">Object</span>&gt; encoder = helper.getSourceEncoder(dataToCache);</span><br><span class="line">      DataCacheWriter&lt;<span class="built_in">Object</span>&gt; writer =</span><br><span class="line">          <span class="keyword">new</span> DataCacheWriter&lt;&gt;(encoder, dataToCache, helper.getOptions());</span><br><span class="line">      originalKey = <span class="keyword">new</span> DataCacheKey(loadData.sourceKey, helper.getSignature());</span><br><span class="line">      helper.getDiskCache().put(originalKey, writer);</span><br><span class="line">    &#125; </span><br><span class="line">    <span class="comment">//省略部分代码</span></span><br><span class="line">    ..........</span><br><span class="line">    sourceCacheGenerator =</span><br><span class="line">        <span class="keyword">new</span> DataCacheGenerator(Collections.singletonList(loadData.sourceKey), helper, <span class="keyword">this</span>);</span><br><span class="line">  &#125;</span><br><span class="line"><span class="comment">/**DecodeJob类的reschedule方法**/</span> </span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line">  <span class="keyword">public</span> <span class="built_in">void</span> reschedule() &#123;</span><br><span class="line">    runReason = RunReason.SWITCH_TO_SOURCE_SERVICE;</span><br><span class="line">    callback.reschedule(<span class="keyword">this</span>);</span><br><span class="line">  &#125;</span><br><span class="line"><span class="comment">/**Engine类的reschedule方法**/</span>   </span><br><span class="line"> <span class="meta">@Override</span></span><br><span class="line">  <span class="keyword">public</span> <span class="built_in">void</span> reschedule(DecodeJob&lt;?&gt; job) &#123;</span><br><span class="line">    getActiveSourceExecutor().execute(job);</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>通过以上源码，其实逻辑已经很清晰，会让你有“柳暗花明又一村”的感觉，onDataReady网络请求成功并且设置了缓存策略，则将图片资源赋值给Object类型的dataToCache，执行回调cb.reschedule，cb就是DecodeJob对象，所以接着执行了DecodeJob对象的reschedule方法，该方法再次执行回调也就是执行了Engine对象的reschedule方法，该方法再次执行DecodeJob，也就会再次触发SourceGenerator类的startNext方法，该方法首先判断了Object类型的dataToCache是否有值，前面分析该对象已经赋值，所以就进入到SourceGenerator对象的cacheData方法存入了我们的原始下载图片的缓存。</p>
+<h4 id="仅从缓存加载图片"><a href="#仅从缓存加载图片" class="headerlink" title="仅从缓存加载图片"></a>仅从缓存加载图片</h4></li>
+<li>前面我基本把Glide的缓存模块梳理了一遍，但是还差个东西，那就是如果我只想Glide加载缓存呢？这种需求还是有的，比如说我们在有些应用看到的省流量模式，不就是正好对应这个需求，没关系Gldie也已经为我们考虑到了，那就是onlyRetrieveFromCache(true)，只要设置了这个，图片在内存缓存或在磁盘缓存中就会被加载出来，而没有缓存，则这一次加载失败。</li>
+<li><p>我们看看如何使用</p>
+<figure class="highlight pony"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">RequestOptions</span> requestOptions = <span class="function"><span class="keyword">new</span> <span class="title">RequestOptions</span>().<span class="title">onlyRetrieveFromCache</span>(true);</span></span><br><span class="line"><span class="function"><span class="title">Glide</span>.<span class="title">with</span>(this).<span class="title">load</span>(<span class="type">IMAGE_URL</span>).<span class="title">apply</span>(requestOptions).<span class="title">into</span>(mImageView);</span></span><br><span class="line"><span class="function"><span class="comment">//Generated API 方式        </span></span></span><br><span class="line"><span class="function"><span class="title">GlideApp</span>.<span class="title">with</span>(this)</span></span><br><span class="line"><span class="function">  .<span class="title">load</span>(url)</span></span><br><span class="line"><span class="function">  .<span class="title">diskCacheStrategy</span>(<span class="type">DiskCacheStrategy</span>.<span class="type">ALL</span>)</span></span><br><span class="line"><span class="function">  .<span class="title">into</span>(mImageView);</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>使用起来还是很方便的，只要设置onlyRetrieveFromCache(true)方法就行，而它的原理也其实也很简单，我们再次回到DecodeJob对象的getNextStage方法，如果前面获取了缓存，则相应得到对应的Generator加载图片，如果获取不到缓存，则枚举Stage.FINISHED，DecodeJob对象的getNextGenerator方法则会返回null。(如下代码所示)</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**DecodeJob类的getNextStage方法**/</span> </span><br><span class="line"><span class="function"><span class="keyword">private</span> Stage <span class="title">getNextStage</span>(<span class="params">Stage current</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">switch</span> (current) &#123;</span><br><span class="line">    <span class="comment">//省略部分代码</span></span><br><span class="line">    ..........</span><br><span class="line">      <span class="keyword">case</span> DATA_CACHE:</span><br><span class="line">        <span class="keyword">return</span> onlyRetrieveFromCache ? Stage.FINISHED : Stage.SOURCE;</span><br><span class="line">      <span class="keyword">case</span> SOURCE:</span><br><span class="line">      <span class="keyword">case</span> FINISHED:</span><br><span class="line">        <span class="keyword">return</span> Stage.FINISHED;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="comment">/**DecodeJob类的getNextGenerator方法**/</span>   </span><br><span class="line"><span class="function"><span class="keyword">private</span> DataFetcherGenerator <span class="title">getNextGenerator</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="keyword">switch</span> (stage) &#123;</span><br><span class="line">    <span class="comment">//省略部分代码</span></span><br><span class="line">    ..........</span><br><span class="line">      <span class="keyword">case</span> FINISHED:</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">      <span class="keyword">default</span>:</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"Unrecognized stage: "</span> + stage);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h5 id="Glide磁盘缓存机制示意图"><a href="#Glide磁盘缓存机制示意图" class="headerlink" title="Glide磁盘缓存机制示意图"></a>Glide磁盘缓存机制示意图</h5><p><img src="https://github.com/maoqitian/MaoMdPhoto/raw/master/%E4%BB%8E%E6%BA%90%E7%A0%81%E8%A7%92%E5%BA%A6%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Glide/Glide%E7%A3%81%E7%9B%98%E7%BC%93%E5%AD%98%E6%9C%BA%E5%88%B6%E7%A4%BA%E6%84%8F%E5%9B%BE.jpg" alt="Glide磁盘缓存机制示意图"></p>
+<h3 id="Glide缓存小结"><a href="#Glide缓存小结" class="headerlink" title="Glide缓存小结"></a>Glide缓存小结</h3><ul>
+<li>通过前面对Glide缓存的分析，让我再次认识到Glide的强大，使用时只是简单的几个方法设置或者不设置，Glide都能够在背后依靠其复杂的逻辑为我们快速的加载出图片并显示，缓存还有一些细节比如可以自定义key等，这里就不进行展开了，有兴趣的可以自行研究。</li>
+</ul>
+<h2 id="Glide-回调与监听"><a href="#Glide-回调与监听" class="headerlink" title="Glide 回调与监听"></a>Glide 回调与监听</h2><h3 id="图片加载成功回调原理"><a href="#图片加载成功回调原理" class="headerlink" title="图片加载成功回调原理"></a>图片加载成功回调原理</h3><ul>
+<li>由上一篇文章分析，我们来回顾一下图片加载成功之后的逻辑。数据加载成功之后切换主线程最终调用SingleRequest类的onResourceReady方法，在该方法中加载成功的数据通过target.onResourceReady方法将数据加载出来，target就是DrawableImageViewTarget对象，他继续了实现了Target接口的基类ImageViewTarget，所以调用它实现的onResourceReady方法或者父类实现的onResourceReady方法就实现了加载成功数据的回调，并由DrawableImageViewTarget对象显示加载成功的图片，这就是数据加载成功回调原理。 <figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**SingleRequest类的onResourceReady方法**/</span>    </span><br><span class="line"><span class="meta">@Nullable</span> </span><br><span class="line"><span class="keyword">private</span> List&lt;RequestListener&lt;R&gt;&gt; requestListeners;</span><br><span class="line"><span class="keyword">private</span> <span class="built_in">void</span> onResourceReady(Resource&lt;R&gt; resource, R result, DataSource dataSource) &#123;</span><br><span class="line">    <span class="comment">//省略部分代码</span></span><br><span class="line">    ..........</span><br><span class="line">    isCallingCallbacks = <span class="literal">true</span>;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      <span class="built_in">boolean</span> anyListenerHandledUpdatingTarget = <span class="literal">false</span>;</span><br><span class="line">      <span class="comment">//省略部分代码</span></span><br><span class="line">     ..........</span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span> (!anyListenerHandledUpdatingTarget) &#123;</span><br><span class="line">        Transition&lt;? <span class="keyword">super</span> R&gt; animation =</span><br><span class="line">            animationFactory.build(dataSource, isFirstResource);</span><br><span class="line">        target.onResourceReady(result, animation);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125; </span><br><span class="line">    <span class="comment">//省略部分代码</span></span><br><span class="line">    ..........</span><br><span class="line">  &#125;</span><br><span class="line"><span class="comment">/**Target 接口**/</span>      </span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> Target&lt;R&gt; <span class="keyword">extends</span> LifecycleListener &#123;&#125;</span><br><span class="line"><span class="comment">/**ImageViewTarget类的onResourceReady方法**/</span> </span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line">  <span class="keyword">public</span> <span class="built_in">void</span> onResourceReady(<span class="meta">@NonNull</span> Z resource, <span class="meta">@Nullable</span> Transition&lt;? <span class="keyword">super</span> Z&gt; transition) &#123;</span><br><span class="line">    <span class="keyword">if</span> (transition == <span class="literal">null</span> || !transition.transition(resource, <span class="keyword">this</span>)) &#123;</span><br><span class="line">      setResourceInternal(resource);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      maybeUpdateAnimatable(resource);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="comment">/**ImageViewTarget类的setResourceInternal方法**/</span> </span><br><span class="line"><span class="keyword">private</span> <span class="built_in">void</span> setResourceInternal(<span class="meta">@Nullable</span> Z resource) &#123;</span><br><span class="line">    setResource(resource);</span><br><span class="line">    maybeUpdateAnimatable(resource);</span><br><span class="line">  &#125;</span><br><span class="line">DrawableImageViewTarget</span><br><span class="line"><span class="comment">/**DrawableImageViewTarget类的setResource方法**/</span> </span><br><span class="line"> <span class="meta">@Override</span></span><br><span class="line">  <span class="keyword">protected</span> <span class="built_in">void</span> setResource(<span class="meta">@Nullable</span> Drawable resource) &#123;</span><br><span class="line">    view.setImageDrawable(resource);</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="Glide监听（listener）"><a href="#Glide监听（listener）" class="headerlink" title="Glide监听（listener）"></a>Glide监听（listener）</h3><ul>
+<li><p>再次看看Glide监听（listener）的例子</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Glide.with(<span class="keyword">this</span>).load(IMAGE_URL).listener(<span class="keyword">new</span> RequestListener&lt;Drawable&gt;() &#123;</span><br><span class="line">           <span class="meta">@Override</span></span><br><span class="line">           <span class="keyword">public</span> <span class="function"><span class="keyword">boolean</span> <span class="title">onLoadFailed</span><span class="params">(@Nullable GlideException e, Object model, Target&lt;Drawable&gt; <span class="keyword">target</span>, <span class="keyword">boolean</span> isFirstResource)</span> </span>&#123;</span><br><span class="line">               <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">           &#125;</span><br><span class="line"></span><br><span class="line">           <span class="meta">@Override</span></span><br><span class="line">           <span class="keyword">public</span> <span class="function"><span class="keyword">boolean</span> <span class="title">onResourceReady</span><span class="params">(Drawable resource, Object model, Target&lt;Drawable&gt; <span class="keyword">target</span>, DataSource dataSource, <span class="keyword">boolean</span> isFirstResource)</span> </span>&#123;</span><br><span class="line">               <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;).into(mImageView);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Glide监听的实现同样还是基于我们上面分析的SingleRequest对象的onResourceReady方法，使用的时候调用RequestBuilder对象的listener方法，传入的RequestListener对象加入到requestListeners，这样在SingleRequest对象的onResourceReady方法中遍历requestListeners，来回调listener.onResourceReady方法，布尔类型的anyListenerHandledUpdatingTarget则接收回调listener.onResourceReady方法的返回值，如果返回true，则不会执会往下执行，则接着的into方法就不会被触发，说明我们自己在监听中处理，返回false则不拦截。</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**RequestBuilder类的listener方法**/</span> </span><br><span class="line"><span class="meta">@Nullable</span> </span><br><span class="line"><span class="keyword">private</span> List&lt;RequestListener&lt;TranscodeType&gt;&gt; requestListeners;</span><br><span class="line">  <span class="keyword">public</span> RequestBuilder&lt;TranscodeType&gt; listener(</span><br><span class="line">      <span class="meta">@Nullable</span> RequestListener&lt;TranscodeType&gt; requestListener) &#123;</span><br><span class="line">    <span class="keyword">this</span>.requestListeners = <span class="keyword">null</span>;</span><br><span class="line">    <span class="function"><span class="keyword">return</span> <span class="title">addListener</span><span class="params">(requestListener)</span></span>;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="comment">/**RequestBuilder类的addListener方法**/</span>  </span><br><span class="line">  <span class="keyword">public</span> RequestBuilder&lt;TranscodeType&gt; addListener(</span><br><span class="line">      <span class="meta">@Nullable</span> RequestListener&lt;TranscodeType&gt; requestListener) &#123;</span><br><span class="line">    <span class="keyword">if</span> (requestListener != <span class="keyword">null</span>) &#123;</span><br><span class="line">      <span class="keyword">if</span> (<span class="keyword">this</span>.requestListeners == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">this</span>.requestListeners = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">this</span>.requestListeners.add(requestListener);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**SingleRequest类的onResourceReady方法**/</span>    </span><br><span class="line"><span class="meta">@Nullable</span> </span><br><span class="line"><span class="keyword">private</span> List&lt;RequestListener&lt;R&gt;&gt; requestListeners;</span><br><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">void</span> <span class="title">onResourceReady</span><span class="params">(Resource&lt;R&gt; resource, R result, DataSource dataSource)</span> </span>&#123;</span><br><span class="line">    <span class="comment">//省略部分代码</span></span><br><span class="line">    ..........</span><br><span class="line">    isCallingCallbacks = <span class="keyword">true</span>;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      <span class="keyword">boolean</span> anyListenerHandledUpdatingTarget = <span class="keyword">false</span>;</span><br><span class="line">      <span class="keyword">if</span> (requestListeners != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">for</span> (RequestListener&lt;R&gt; listener : requestListeners) &#123;</span><br><span class="line">          anyListenerHandledUpdatingTarget |=</span><br><span class="line">              listener.onResourceReady(result, model, <span class="keyword">target</span>, dataSource, isFirstResource);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">      anyListenerHandledUpdatingTarget |=</span><br><span class="line">          targetListener != <span class="keyword">null</span></span><br><span class="line">              &amp;&amp; targetListener.onResourceReady(result, model, <span class="keyword">target</span>, dataSource, isFirstResource);</span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span> (!anyListenerHandledUpdatingTarget) &#123;</span><br><span class="line">        Transition&lt;? <span class="keyword">super</span> R&gt; animation =</span><br><span class="line">            animationFactory.build(dataSource, isFirstResource);</span><br><span class="line">        <span class="keyword">target</span>.onResourceReady(result, animation);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125; </span><br><span class="line">    <span class="comment">//省略部分代码</span></span><br><span class="line">    ..........</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="Target（目标）"><a href="#Target（目标）" class="headerlink" title="Target（目标）"></a>Target（目标）</h2><ul>
+<li>Target在Glide中相当于中间人的作用，在图片的展示起到承上启下的功效，首先看看Target接口的继承关系图</li>
+</ul>
+<p><img src="https://github.com/maoqitian/MaoMdPhoto/raw/master/%E4%BB%8E%E6%BA%90%E7%A0%81%E8%A7%92%E5%BA%A6%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Glide/Target%E7%BB%A7%E6%89%BF%E5%85%B3%E7%B3%BB%E5%9B%BE.png" alt="Target继承关系图"></p>
+<ul>
+<li>通过该图，我们可以把Target分为三类，一种是简单的Target，一种是加载到特定View的Target(ViewTarget)，还有一种是FutureTarget，可以知道异步执行的结果，得到缓存文件</li>
+<li>上一篇文章分析into方法时我们是分析into(ImageView)这个方法开始的，它内部还是会得到特定的Target对象，也就是我们一直说的DrawableImageViewTarget，而他是属于ViewTarget的子类<h3 id="简单的Target（SimpleTarget）"><a href="#简单的Target（SimpleTarget）" class="headerlink" title="简单的Target（SimpleTarget）"></a>简单的Target（SimpleTarget）</h3></li>
+<li>SimpleTarget其实是在给我们更灵活的加载到各种各样对象准备的，只要指定我们加载获取的是什么对象asBitmap()，就能使用SimpleTarge或者集成它的我们自定义的对象，在其中通过获取的Bitmap显示在对应的控件上，比如上一篇文章例子提到的NotifivationTarget，就是加载到指定的Notifivation中，灵活加载。<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//注意需要指定Glide的加载类型asBitmap，不指定Target不知道本身是是类型的Target</span></span><br><span class="line"><span class="selector-tag">Glide</span><span class="selector-class">.with</span>(this)<span class="selector-class">.asBitmap</span>()<span class="selector-class">.load</span>(IMAGE_URL)<span class="selector-class">.into</span>(new SimpleTarget&lt;Bitmap&gt;() &#123;</span><br><span class="line">            <span class="variable">@Override</span></span><br><span class="line">            public void onResourceReady(<span class="variable">@NonNull</span> Bitmap resource, <span class="variable">@Nullable</span> Transition&lt;? super Bitmap&gt; transition) &#123;</span><br><span class="line">            <span class="comment">//加载完成已经在主线程</span></span><br><span class="line">                <span class="selector-tag">mImageView</span><span class="selector-class">.setImageBitmap</span>(resource);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="特定View的Target-ViewTarget"><a href="#特定View的Target-ViewTarget" class="headerlink" title="特定View的Target(ViewTarget)"></a>特定View的Target(ViewTarget)</h3><ul>
+<li>由DrawableImageViewTarget和BitmapImageViewTarget我们就可以知道这是为了不同类型的图片资源准备的Target，但是还有一种需求，就是如果我们传入是要加载图片资源的View，但是该View不被Glide支持，目前into方法支持传入ImageView，没关系，ViewTarget可以帮上忙，比如我们需要加载到RelativeLayout<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> maoqitian</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@Description</span>: 自定义RelativeLayout</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2019/2/18 0018 19:51</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyView</span> <span class="keyword">extends</span> <span class="title">RelativeLayout</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> ViewTarget&lt;MyView, Drawable&gt; viewTarget;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MyView</span><span class="params">(Context context)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(context);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MyView</span><span class="params">(Context context, AttributeSet attrs)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(context, attrs);</span><br><span class="line">        viewTarget =<span class="keyword">new</span> ViewTarget&lt;MyView, Drawable&gt;(<span class="keyword">this</span>) &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onResourceReady</span><span class="params">(@NonNull Drawable resource, @Nullable Transition&lt;? <span class="keyword">super</span> Drawable&gt; transition)</span> </span>&#123;</span><br><span class="line">                setBackground(resource);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> ViewTarget&lt;MyView, Drawable&gt; <span class="title">getViewTarget</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> viewTarget;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//使用Glide加载</span></span><br><span class="line">MyView rl_view = findViewById(R.id.rl_view);</span><br><span class="line">Glide.with(<span class="keyword">this</span>).load(IMAGE_URL).into(rl_view.getViewTarget());</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="FutureTarget"><a href="#FutureTarget" class="headerlink" title="FutureTarget"></a>FutureTarget</h3><ul>
+<li>FutureTarget的一大用处就是可以得到缓存文件</li>
+</ul>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> Thread(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="keyword">public</span> <span class="function"><span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                FutureTarget&lt;File&gt; <span class="keyword">target</span> = <span class="keyword">null</span>;</span><br><span class="line">                RequestManager requestManager = Glide.with(MainActivity.<span class="keyword">this</span>);</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    <span class="keyword">target</span> = requestManager</span><br><span class="line">                            .downloadOnly()</span><br><span class="line">                            .load(IMAGE_URL)</span><br><span class="line">                            .submit();</span><br><span class="line">                    <span class="keyword">final</span> File downloadedFile = <span class="keyword">target</span>.get();</span><br><span class="line">                    Log.i(TAG,<span class="string">"缓存文件路径"</span>+downloadedFile.getAbsolutePath());</span><br><span class="line">                &#125; <span class="keyword">catch</span> (ExecutionException | InterruptedException e) &#123;</span><br><span class="line"></span><br><span class="line">                &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">                    <span class="keyword">if</span> (<span class="keyword">target</span> != <span class="keyword">null</span>) &#123;</span><br><span class="line">                        <span class="keyword">target</span>.cancel(<span class="keyword">true</span>); <span class="comment">// mayInterruptIfRunning</span></span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;).start();</span><br></pre></td></tr></table></figure>
+<h3 id="preload（预加载）"><a href="#preload（预加载）" class="headerlink" title="preload（预加载）"></a>preload（预加载）</h3><ul>
+<li><p>如何使用</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">Glide</span><span class="selector-class">.with</span>(<span class="selector-tag">this</span>)<span class="selector-class">.load</span>(<span class="selector-tag">IMAGE_URL</span>)<span class="selector-class">.preload</span>();</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>预加载其实也是属于Target的范围，只是他加载的对象为空而已，也就是没有加载目标</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**RequestBuilder类的preload方法**/</span></span><br><span class="line"> <span class="meta">@NonNull</span></span><br><span class="line">  <span class="keyword">public</span> Target&lt;TranscodeType&gt; preload() &#123;</span><br><span class="line">    <span class="function"><span class="keyword">return</span> <span class="title">preload</span><span class="params">(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)</span></span>;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="comment">/**RequestBuilder类的preload方法**/</span> </span><br><span class="line"><span class="meta">@NonNull</span></span><br><span class="line">  <span class="keyword">public</span> Target&lt;TranscodeType&gt; preload(<span class="keyword">int</span> width, <span class="keyword">int</span> height) &#123;</span><br><span class="line">    <span class="keyword">final</span> PreloadTarget&lt;TranscodeType&gt; <span class="keyword">target</span> = PreloadTarget.obtain(requestManager, width, height);</span><br><span class="line">    <span class="function"><span class="keyword">return</span> <span class="title">into</span><span class="params">(<span class="keyword">target</span>)</span></span>;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="comment">/**RequestBuilder类的onResourceReady方法**/</span>   </span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">PreloadTarget</span>&lt;<span class="title">Z</span>&gt; <span class="keyword">extends</span> <span class="title">SimpleTarget</span>&lt;<span class="title">Z</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Handler HANDLER = <span class="keyword">new</span> Handler(Looper.getMainLooper(), <span class="keyword">new</span> Callback() &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">boolean</span> <span class="title">handleMessage</span><span class="params">(Message message)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">if</span> (message.what == MESSAGE_CLEAR) &#123;</span><br><span class="line">        ((PreloadTarget&lt;?&gt;) message.obj).clear();</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">//省略部分代码</span></span><br><span class="line">    ..........</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;Z&gt; PreloadTarget&lt;Z&gt; obtain(RequestManager requestManager, <span class="keyword">int</span> width, <span class="keyword">int</span> height) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> PreloadTarget&lt;&gt;(requestManager, width, height);</span><br><span class="line">  &#125; </span><br><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line">  <span class="keyword">public</span> <span class="function"><span class="keyword">void</span> <span class="title">onResourceReady</span><span class="params">(@NonNull Z resource, @Nullable Transition&lt;? <span class="keyword">super</span> Z&gt; transition)</span> </span>&#123;</span><br><span class="line">    HANDLER.obtainMessage(MESSAGE_CLEAR, <span class="keyword">this</span>).sendToTarget();</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">//省略部分代码</span></span><br><span class="line">    ..........</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>通过以上源码，逻辑已经非常清晰，Glide的preload方法里使用的继承SimpleTarget的PreloadTarget对象来作为Target，在它的onResourceReady方法中并没有任何的加载操作，只是调用了Handler来释放资源，到这里也许你会有疑惑，不是说预加载么，怎么不加载。哈哈，其实到onResourceReady方法被调用经过前面的分析Glide已经走完缓存的所有逻辑，那就很容易理解了，预加载只是把图片加载到缓存当中，没有进行其他操作，自然是预加载，并且加载完成之后释放了资源。</p>
+</li>
+</ul>
+<h2 id="Generated-API"><a href="#Generated-API" class="headerlink" title="Generated API"></a>Generated API</h2><ul>
+<li>Generated API说白了就是Glide使用注解处理器生成一个API（GlideApp），该API可以代替Glide帮助我们完成图片加载。</li>
+<li>Generated API 目前仅可以在 Application 模块内使用，使用Generated API一方面在Application 模块中可将常用的选项组打包成一个选项在 Generated API 中使用，另一方面可以为Generated API 扩展自定义选项（扩展我们自定义的功能方法）。</li>
+<li>在上一篇文章中例子中我们可以看到使用Generated API之后使用Glide的方式基本上和Glide3的用法一样流式API使用，先来回顾一下如何使用Generated API</li>
+</ul>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//在app下的gradle添加Glide注解处理器的依赖</span></span><br><span class="line">dependencies &#123;</span><br><span class="line">  annotationProcessor <span class="symbol">'com</span>.github.bumptech.glide:compiler:<span class="number">4.8</span><span class="number">.0</span>'</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//新建一个类集成AppGlideModule并添加上@GlideModule注解，重新rebuild项目就可以使用GlideApp了</span></span><br><span class="line"><span class="meta">@GlideModule</span></span><br><span class="line">public <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">MyAppGlideModule</span> <span class="keyword">extends</span> <span class="title">AppGlideModule</span> </span>&#123;&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>经过上的代码的操作，通过Glide注解处理器已经给我们生成了GlideApp类</li>
+</ul>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**GlideApp类部分代码**/</span> </span><br><span class="line">public <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">GlideApp</span> </span>&#123;</span><br><span class="line">    <span class="comment">//省略部分代码</span></span><br><span class="line">    ..........</span><br><span class="line">    <span class="meta">@NonNull</span></span><br><span class="line">    public static <span class="type">GlideRequests</span> <span class="keyword">with</span>(<span class="meta">@NonNull</span> <span class="type">Context</span> context) &#123;</span><br><span class="line">    <span class="keyword">return</span> (<span class="type">GlideRequests</span>) <span class="type">Glide</span>.<span class="keyword">with</span>(context);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">//省略部分代码</span></span><br><span class="line">    ..........</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/**GlideApp类部分代码**/</span> </span><br><span class="line">public <span class="class"><span class="keyword">class</span> <span class="title">GlideRequest&lt;TranscodeType&gt;</span> <span class="keyword">extends</span> <span class="title">RequestBuilder&lt;TranscodeType&gt;</span> <span class="title">implements</span> <span class="title">Cloneable</span> </span>&#123;</span><br><span class="line"><span class="comment">//省略部分代码</span></span><br><span class="line">    ..........</span><br><span class="line">  <span class="meta">@NonNull</span></span><br><span class="line">  <span class="meta">@CheckResult</span></span><br><span class="line">  public <span class="type">GlideRequest</span>&lt;<span class="type">TranscodeType</span>&gt; placeholder(<span class="meta">@Nullable</span> <span class="type">Drawable</span> drawable) &#123;</span><br><span class="line">    <span class="keyword">if</span> (getMutableOptions() instanceof <span class="type">GlideOptions</span>) &#123;</span><br><span class="line">      <span class="keyword">this</span>.requestOptions = ((<span class="type">GlideOptions</span>) getMutableOptions()).placeholder(drawable);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="keyword">this</span>.requestOptions = <span class="keyword">new</span> <span class="type">GlideOptions</span>().apply(<span class="keyword">this</span>.requestOptions).placeholder(drawable);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">//省略部分代码</span></span><br><span class="line">    ..........</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/**RequestBuilder类的getMutableOptions方法**/</span> </span><br><span class="line"><span class="keyword">protected</span> <span class="type">RequestOptions</span> getMutableOptions() &#123;</span><br><span class="line">    <span class="keyword">return</span> defaultRequestOptions == <span class="keyword">this</span>.requestOptions</span><br><span class="line">        ? <span class="keyword">this</span>.requestOptions.clone() : <span class="keyword">this</span>.requestOptions;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>通过以上源码，可以发现，GlideApp对象的with方法返回的是GlideRequests对象，GlideRequests对象继承的是RequestBuilder，这时应该又是豁然开朗的感觉，GlideApp能够适应流式API，其实就是对RequestBuilder包装了一层，GlideRequests对象通过其父类RequestBuilder对象的getMutableOptions方法获取到requestOptions，然后在相应的方法中操作requestOptions以达到可以使用流式API的功能。<h3 id="GlideExtension"><a href="#GlideExtension" class="headerlink" title="GlideExtension"></a>GlideExtension</h3></li>
+<li>GlideExtension字面意思就是Glide扩展，它是一个作用于类上的注解，任何扩展 Glide API 的类都必须使用这个注解来标记，否则其中被注解的方法就会被忽略。<br>被 @GlideExtension 注解的类应以工具类的思维编写。这种类应该有一个私有的、空的构造方法，应为 final 类型，并且仅包含静态方法。<h4 id="GlideOption"><a href="#GlideOption" class="headerlink" title="@GlideOption"></a>@GlideOption</h4></li>
+<li><p>GlideOption注解是用来扩展RequestOptions，扩展功能方法第一个参数必须是RequestOptions。下面我们通过设置一个扩展默认设置占位符和错误符方法的例子来说明GlideOption注解。</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> maoqitian</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@Description</span>: GlideApp 功能扩展类</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2019/2/19 0019 12:51</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@GlideExtension</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyGlideExtension</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> MyGlideExtension() &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//可以为方法任意添加参数，但要保证第一个参数为 RequestOptions</span></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 设置通用的加载占位图和错误加载图</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> options</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@GlideOption</span></span><br><span class="line">    <span class="keyword">public</span> static void normalPlaceholder(RequestOptions options) &#123;</span><br><span class="line">        options.placeholder(R.drawable.ic_cloud_download_black_24dp).error(R.drawable.ic_error_black_24dp);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/**GlideOptions类中生成对应的方法**/</span></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">   * <span class="doctag">@see</span> MyGlideExtension#normalPlaceholder(RequestOptions)</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">  <span class="meta">@CheckResult</span></span><br><span class="line">  <span class="meta">@NonNull</span></span><br><span class="line">  <span class="keyword">public</span> GlideOptions normalPlaceholder() &#123;</span><br><span class="line">    <span class="keyword">if</span> (isAutoCloneEnabled()) &#123;</span><br><span class="line">      <span class="keyword">return</span> clone().normalPlaceholder();</span><br><span class="line">    &#125;</span><br><span class="line">    MyGlideExtension.normalPlaceholder(<span class="keyword">this</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="comment">/**GlideRequest类中生成对应的方法**/</span>  </span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">   * <span class="doctag">@see</span> GlideOptions#normalPlaceholder()</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">  <span class="meta">@CheckResult</span></span><br><span class="line">  <span class="meta">@NonNull</span></span><br><span class="line">  <span class="keyword">public</span> GlideRequest&lt;TranscodeType&gt; normalPlaceholder() &#123;</span><br><span class="line">    <span class="keyword">if</span> (getMutableOptions() instanceof GlideOptions) &#123;</span><br><span class="line">      <span class="keyword">this</span>.requestOptions = ((GlideOptions) getMutableOptions()).normalPlaceholder();</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="keyword">this</span>.requestOptions = new GlideOptions().apply(<span class="keyword">this</span>.requestOptions).normalPlaceholder();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>如上代码所示，我们可以通过@GlideExtension注解设置自己功能扩展类，使用@GlideOption注解标注对赢扩展功能静态方法，重构项目后Glide注解处理器则会自动在GlideOptions对象和GlideRequest对象中生成相应的方法能够被我们调用</p>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//调用我们刚刚设置的扩展功能方法</span></span><br><span class="line"><span class="selector-tag">GlideApp</span><span class="selector-class">.with</span>(this)<span class="selector-class">.load</span>(IMAGE_URL)</span><br><span class="line">                <span class="selector-class">.normalPlaceholder</span>()</span><br><span class="line">                <span class="selector-class">.into</span>(mImageView);</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h4 id="GlideType"><a href="#GlideType" class="headerlink" title="GlideType"></a>GlideType</h4><ul>
+<li><p>GlideType注解是用于扩展RequestManager的，同理扩展的方法第一个参数必须是RequestManager，并设置类型为加载资源类型，该注解主要作用就是扩展Glide支持加载资源的类型，以下举出官方文档支持gif的一个例子，还是在我们刚刚扩展功能类中。</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@GlideExtension</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyGlideExtension</span> &#123;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> RequestOptions DECODE_TYPE_GIF = decodeTypeOf(GifDrawable.<span class="keyword">class</span>).lock();</span><br><span class="line"></span><br><span class="line">    <span class="meta">@GlideType</span>(GifDrawable.<span class="keyword">class</span>)</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> asMyGif(RequestBuilder&lt;GifDrawable&gt; requestBuilder) &#123;</span><br><span class="line">        requestBuilder</span><br><span class="line">                .transition(<span class="keyword">new</span> DrawableTransitionOptions())</span><br><span class="line">                .apply(DECODE_TYPE_GIF);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**GlideRequests类中生成的asMyGif方法**/</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">   * <span class="doctag">@see</span> MyGlideExtension#asMyGif(RequestBuilder)</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">  <span class="meta">@NonNull</span></span><br><span class="line">  <span class="meta">@CheckResult</span></span><br><span class="line">  <span class="keyword">public</span> GlideRequest&lt;GifDrawable&gt; asMyGif() &#123;</span><br><span class="line">    GlideRequest&lt;GifDrawable&gt; requestBuilder = <span class="keyword">this</span>.<span class="keyword">as</span>(GifDrawable.<span class="keyword">class</span>);</span><br><span class="line">    MyGlideExtension.asMyGif(requestBuilder);</span><br><span class="line">    <span class="keyword">return</span> requestBuilder;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>同理在我们加载Gif资源的时候可以直接使用</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">GlideApp</span><span class="selector-class">.with</span>(<span class="selector-tag">this</span>)<span class="selector-class">.asMyGif</span>()<span class="selector-class">.load</span>(<span class="selector-tag">IMAGE_URL</span>)</span><br><span class="line">               <span class="selector-class">.into</span>(<span class="selector-tag">mImageView</span>);</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="源码阅读方法思路"><a href="#源码阅读方法思路" class="headerlink" title="源码阅读方法思路"></a>源码阅读方法思路</h2><ul>
+<li>看了这么多源码，其实我想说说框架源码阅读的方法思路：<ul>
+<li>1.首先自己能把框架大体的流程走一遍，然后根据自己刚刚的思路把文章写出来，在写文章的同时也能发现自己刚刚的思路是否有问题，慢慢纠正</li>
+<li>2.文章写完，把整体流程图画出来，画图的过程一个是复习思路，还可以让自己对源码逻辑更加清晰</li>
+<li>3.阅读框架源码时看到英文注释可以先理解其含义，在你看源码没头绪的时候往往思路就在注释中，如果对源码中一个类很迷惑，可以直接看该类的头部注释往往注明了该类的作用。</li>
+</ul>
+</li>
+<li><h2 id="最后说点"><a href="#最后说点" class="headerlink" title="最后说点"></a>最后说点</h2></li>
+<li><p>到此，真的很想大叫一声宣泄一下，Glide源码就像一座山，一座高峰，你必须沉住气，慢慢的解读，要不然稍不留神就会掉入代码的海洋，迷失方向。回头看看，你不得不感叹正式由于Glide源码中成千上万行的代码，才造就了这样一个强大的框架。最后，也非常感谢您阅读我的文章，文章中如果有错误，请大家给我提出来，大家一起学习进步，如果觉得我的文章给予你帮助，也请给我一个喜欢和关注，同时也欢迎访问我的<a href="https://www.maoqitian.com"><strong>个人博客</strong></a>。</p>
+</li>
+<li><p>参考链接</p>
+<ul>
+<li><a href="http://bumptech.github.io/glide/" target="_blank" rel="noopener">Gldie文档</a></li>
+</ul>
+</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+ <div>
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-heart"></i>感谢阅读-------------</div>
+    
+</div>
+
+    
+ </div>	
+
+    
+
+    
+
+    
+      <div>
+        <script src="https://cdn.bootcss.com/jquery/2.0.0/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<ul class="post-copyright">
+  <li class="post-copyright-title">
+    <strong>本文标题：</strong>
+    从源码角度深入理解Glide（下）
+  </li>
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    maoqitian
+  </li>
+  <li class="post-copyright-created_at">
+    <strong>发布时间：</strong>
+    2019-02-19
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://www.maoqitian.com/2019/02/19/从源码角度深入理解Glide（下）/" title="从源码角度深入理解Glide（下）">https://www.maoqitian.com/2019/02/19/从源码角度深入理解Glide（下）/</a>
+	<span class="copy-path" title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="https://www.maoqitian.com/2019/02/19/从源码角度深入理解Glide（下）/" aria-label="复制成功！"></i></span>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.zh" rel="external nofollow" target="_blank">CC BY-NC-ND 4.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+<script> 
+    var clipboard = new Clipboard('.fa-clipboard');
+    $(".fa-clipboard").click(function(){
+      clipboard.on('success', function(){
+        swal({
+          title: "",
+          text: '复制文章链接成功',
+          icon: "success",
+          showConfirmButton: true
+          });
+	    });
+    });  
+</script>
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"><i class="fa fa-tag"></i> Android</a>
+          
+            <a href="/tags/源码分析/" rel="tag"><i class="fa fa-tag"></i> 源码分析</a>
+          
+            <a href="/tags/Glide/" rel="tag"><i class="fa fa-tag"></i> Glide</a>
+          
+            <a href="/tags/图片加载/" rel="tag"><i class="fa fa-tag"></i> 图片加载</a>
+          
+            <a href="/tags/LRU/" rel="tag"><i class="fa fa-tag"></i> LRU</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/02/19/从源码角度深入理解Glide（上）/" rel="next" title="从源码角度深入理解Glide（上）">
+                <i class="fa fa-chevron-left"></i> 从源码角度深入理解Glide（上）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/03/12/从零开始-hexo-个人博客搭建完全指南/" rel="prev" title="从零开始 hexo 个人博客搭建完全指南">
+                从零开始 hexo 个人博客搭建完全指南 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "1",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      },
+      "slide": {
+        "bdImg": "5",
+        "bdPos": "left",
+        "bdTop": "100"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC80MjU2MS8xOTEwOA=="></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+      <div id="sidebar-dimmer"></div>
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="maoqitian">
+            
+              <p class="site-author-name" itemprop="name">maoqitian</p>
+              <p class="site-description motion-element" itemprop="description">“life was like a box a chocolates, never know what you're gonna get.”</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">69</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/maoqitian" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://juejin.im/user/59e956626fb9a045204b57d4" target="_blank" title="掘金">
+                      
+                        <i class="fa fa-fw fa-drupal"></i>掘金</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.jianshu.com/u/f58cd7ff1a08" target="_blank" title="简书">
+                      
+                        <i class="fa fa-fw fa-book"></i>简书</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:maoqitian068@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-pagelines"></i>
+                友情链接
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://www.wanandroid.com/" title="玩Android" target="_blank">玩Android</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://kymjs.com" title="开源实验室" target="_blank">开源实验室</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://liuwangshu.cn/" title="刘望舒的博客" target="_blank">刘望舒的博客</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Glide缓存"><span class="nav-number">1.</span> <span class="nav-text">Glide缓存</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#缓存的key"><span class="nav-number">1.1.</span> <span class="nav-text">缓存的key</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#缓存Key的生成"><span class="nav-number">1.1.1.</span> <span class="nav-text">缓存Key的生成</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LRU"><span class="nav-number">1.2.</span> <span class="nav-text">LRU</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#LRU算法思想"><span class="nav-number">1.2.1.</span> <span class="nav-text">LRU算法思想</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#内存缓存"><span class="nav-number">1.3.</span> <span class="nav-text">内存缓存</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#内存缓存相关API"><span class="nav-number">1.3.1.</span> <span class="nav-text">内存缓存相关API</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#内存缓存源码分析"><span class="nav-number">1.3.2.</span> <span class="nav-text">内存缓存源码分析</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#活动资源-Active-Resources"><span class="nav-number">1.3.2.1.</span> <span class="nav-text">活动资源 (Active Resources)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#内存缓存-Memory-cache"><span class="nav-number">1.3.2.2.</span> <span class="nav-text">内存缓存 (Memory cache)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#内存缓存写入"><span class="nav-number">1.3.2.3.</span> <span class="nav-text">内存缓存写入</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Glide内存缓存机制示意图"><span class="nav-number">1.3.2.4.</span> <span class="nav-text">Glide内存缓存机制示意图</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#磁盘缓存"><span class="nav-number">1.4.</span> <span class="nav-text">磁盘缓存</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#磁盘缓存策略"><span class="nav-number">1.4.1.</span> <span class="nav-text">磁盘缓存策略</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#磁盘缓存源码分析"><span class="nav-number">1.4.2.</span> <span class="nav-text">磁盘缓存源码分析</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#资源类型（Resource）"><span class="nav-number">1.4.2.1.</span> <span class="nav-text">资源类型（Resource）</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#数据来源-Data"><span class="nav-number">1.4.2.2.</span> <span class="nav-text">数据来源 (Data)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#磁盘缓存数据存入"><span class="nav-number">1.4.2.3.</span> <span class="nav-text">磁盘缓存数据存入</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#仅从缓存加载图片"><span class="nav-number">1.4.3.</span> <span class="nav-text">仅从缓存加载图片</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Glide磁盘缓存机制示意图"><span class="nav-number">1.4.3.1.</span> <span class="nav-text">Glide磁盘缓存机制示意图</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Glide缓存小结"><span class="nav-number">1.5.</span> <span class="nav-text">Glide缓存小结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Glide-回调与监听"><span class="nav-number">2.</span> <span class="nav-text">Glide 回调与监听</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#图片加载成功回调原理"><span class="nav-number">2.1.</span> <span class="nav-text">图片加载成功回调原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Glide监听（listener）"><span class="nav-number">2.2.</span> <span class="nav-text">Glide监听（listener）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Target（目标）"><span class="nav-number">3.</span> <span class="nav-text">Target（目标）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#简单的Target（SimpleTarget）"><span class="nav-number">3.1.</span> <span class="nav-text">简单的Target（SimpleTarget）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#特定View的Target-ViewTarget"><span class="nav-number">3.2.</span> <span class="nav-text">特定View的Target(ViewTarget)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#FutureTarget"><span class="nav-number">3.3.</span> <span class="nav-text">FutureTarget</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#preload（预加载）"><span class="nav-number">3.4.</span> <span class="nav-text">preload（预加载）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Generated-API"><span class="nav-number">4.</span> <span class="nav-text">Generated API</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#GlideExtension"><span class="nav-number">4.1.</span> <span class="nav-text">GlideExtension</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#GlideOption"><span class="nav-number">4.1.1.</span> <span class="nav-text">@GlideOption</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#GlideType"><span class="nav-number">4.1.2.</span> <span class="nav-text">GlideType</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#源码阅读方法思路"><span class="nav-number">5.</span> <span class="nav-text">源码阅读方法思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#最后说点"><span class="nav-number">6.</span> <span class="nav-text">最后说点</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">maoqitian</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i> 本站访客数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人次
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i> 本站总访问量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+  <div class="bg_content">
+  <canvas id="canvas"></canvas>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("VcqMEKTUVGDpIwJn6RGgftJk-gzGzoHsz", "wpViln3oXrO2G2WMVVxfqvuh");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 自定义页面背景动效 -->
+<script type="text/javascript" src="/js/src/dynamic_bg.js"></script>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>
