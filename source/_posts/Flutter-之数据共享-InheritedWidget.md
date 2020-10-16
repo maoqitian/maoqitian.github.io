@@ -6,7 +6,6 @@ categories:
 tags: 
 - dart
 - Flutter
-top: true
 ---
 ![image](https://raw.githubusercontent.com/maoqitian/MaoMdPhoto/master/flutter/flutter-logo.png)
 > Flutter 中Widget 多种多样，有UI的，当然也有功能型的组件InheritedWidget 组件就是Flutter 中的一个功能组件，它可以实现Flutter 组件之间的数据共享，他的数据传递方向在Widget树传递是从上到下的。

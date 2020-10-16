@@ -9,7 +9,6 @@ tags:
 - Retrofit2
 - RxJava2
 - Dagger2
-top: true
 ---
 [![License](https://img.shields.io/badge/license-Apache%202-green.svg)](https://www.apache.org/licenses/LICENSE-2.0)<img src="https://img.shields.io/badge/Android-1.0.5-blue.svg" />
 > 项目地址 [https://github.com/maoqitian/MaoWanAndoidClient](https://github.com/maoqitian/MaoWanAndoidClient)

@@ -6,7 +6,6 @@ categories:
 tags: 
 - MVP
 - Dagger2
-top: true
 ---
 > 开发一个App，和起房子应该有异曲同工之处，起房子需要画好设计图纸，而我们开发App则需要先设计好App整个架构模式。目前Android一般有MVC、MVP和MVVM，本文则先来说说MVP架构。在了解MVP架构之前，有人可能会说，MVP架构是不是有点落后了，但是我想说，如果你公司有老项目，他就是用MVP架构写的，这时候我们MVP知识是不是就派上用场了；任何架构都有它存在的理由，学习架构的思想才是关键。MVP分别代表Model、View、Presenter三个英文字母，和传统的MVC 相比，C替换成了P。Presenter英文单词有主持人意思，也就是说Presenter是View 和 Model 的主持人，按照惯例我们先来看两张图。
 # MVC MVP 架构对比图
